@@ -4,18 +4,19 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Docs | Template-Hugo</title>
+<meta name="description" content=""><meta property="og:title" content="Docs" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://hello-world-example.github.io/Java-IO/docs/" />
+
+<title>Docs | Java-IO</title>
+<link rel="icon" href="/Java-IO/favicon.png" type="image/x-icon">
 
 
-<link rel="stylesheet" href="/Template-Hugo/book.min.6c7317d2e8552a0ac3ea8fd4ba500c3dfb1cc9c74e7afd73eee6d729751fad30.css">
+<link rel="stylesheet" href="/Java-IO/book.min.d436f463c9471cfab26a8b71cd2f50b6abf5225806391453da4ca111d1834fef.css" integrity="sha256-1Db0Y8lHHPqyaotxzS9Qtqv1IlgGORRT2kyhEdGDT&#43;8=">
 
 
-
-
-<link rel="icon" href="/Template-Hugo/favicon.png" type="image/x-icon">
-
-
-<link rel="alternate" type="application/rss+xml" href="https://hello-world-example.github.io/Template-Hugo/docs/index.xml" title="Template-Hugo" />
+<link rel="alternate" type="application/rss+xml" href="https://hello-world-example.github.io/Java-IO/docs/index.xml" title="Java-IO" />
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
@@ -25,13 +26,14 @@ https://github.com/alex-shpak/hugo-book
 </head>
 
 <body>
-  <input type="checkbox" style="display: none" id="menu-control" />
-  <main class="flex container">
-
-    <aside class="book-menu fixed">
-      <nav>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
 <h2 class="book-brand">
-  <a href="https://hello-world-example.github.io/Template-Hugo/">Template-Hugo</a>
+  <a href="/Java-IO"><span>Java-IO</span>
+  </a>
 </h2>
 
 
@@ -39,28 +41,27 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-    
-  
-  
-  
 
-  <style>
-  nav ul a[href$="\2fTemplate-Hugo\2f docs\2f "] {
-      color: #004ed0;
-  }
-  </style>
 
+
+
+
+
+  <ul>
+<li><a href="/Java-IO/">简介</a></li>
+<li><strong>BIO</strong></li>
+<li><a href="io/nio/">NIO</a>
 <ul>
-<li><p><a href="/Template-Hugo/">简介</a></p></li>
-
-<li><p><strong>示例</strong></p>
-
-<ul>
-<li><a href="/Template-Hugo/docs/with-toc/">默认带目录</a></li>
-<li><a href="/Template-Hugo/docs/without-toc/">设置不带目录</a></li>
-<li><a href="/Template-Hugo/docs/shortcodes/">特有功能</a><br /></li>
-</ul></li>
+<li>Channel</li>
+<li><a href="io/nio/buffer/">Buffer</a></li>
+<li><a href="io/nio/selector/">Selector</a></li>
 </ul>
+</li>
+<li><strong>AIO</strong></li>
+</ul>
+
+
+
 
 
 
@@ -71,52 +72,104 @@ https://github.com/alex-shpak/hugo-book
 </nav>
 
 
-<script>
-(function() {
-  var menu = document.querySelector("aside.book-menu nav");
-  addEventListener("beforeunload", function(event) {
-    localStorage.setItem("menu.scrollTop", menu.scrollTop);
-  });
-  menu.scrollTop = localStorage.getItem("menu.scrollTop");
-})();
-</script>
 
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
     </aside>
 
     <div class="book-page">
-      <header class="flex align-center justify-between book-header">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
   <label for="menu-control">
-    <img src="/Template-Hugo/svg/menu.svg" alt="Menu" />
+    <img src="/Java-IO/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
+
   <strong>Docs</strong>
-</header>
 
-      
-<article class="markdown"></article>
-
-      
-<div class="book-footer justify-end">
-  
-  
-  <div>
-    
-  </div>
-  
+  <label for="toc-control">
+    <img src="/Java-IO/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
 </div>
 
 
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
       
+  
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"></article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+
+
+</div>
+
+ 
+        
+<script>
+var images = document.getElementsByTagName("img")
+console.info(images.length)
+for(var i=0; i<images.length; i++){
+  var image = images[i]
+  var src = image.getAttribute("src");
+  if(src.startsWith("-images")){
+    image.setAttribute("src", "../" + src)
+  }
+}
+</script>
+
+      </footer>
+
+      
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
     </div>
 
     
+    <aside class="book-toc">
+      
   
 
-
-
+ 
+    </aside>
+    
   </main>
-  
-  
+
   
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
