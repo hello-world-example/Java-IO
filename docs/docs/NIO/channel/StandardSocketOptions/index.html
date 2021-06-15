@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="StandardSocketOptions TODO
+https://blog.csdn.net/zero__007/article/details/51723434
+   枚举值 说明     IP_MULTICAST_IF This option is used to specify the network interface (NetworkInterface) used for multicast datagrams sent by the datagram-oriented socket; if it is null, then the OS will choose the outgoing interface (if one is available). By default, it is null, but the option’s value can be set after the socket is bound. When we talk about sending datagrams, you will see how to find out what multicast interfaces are available on your machine."><meta property="og:title" content="" />
+<meta property="og:description" content="StandardSocketOptions TODO
+https://blog.csdn.net/zero__007/article/details/51723434
+   枚举值 说明     IP_MULTICAST_IF This option is used to specify the network interface (NetworkInterface) used for multicast datagrams sent by the datagram-oriented socket; if it is null, then the OS will choose the outgoing interface (if one is available). By default, it is null, but the option’s value can be set after the socket is bound. When we talk about sending datagrams, you will see how to find out what multicast interfaces are available on your machine." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hello-world-example.github.io/Java-IO/docs/NIO/channel/StandardSocketOptions/" />
+<meta property="article:modified_time" content="2020-03-02T18:22:05+08:00" />
+<title>Standard Socket Options | Java-IO</title>
+<link rel="icon" href="/Java-IO/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/Java-IO/book.min.d436f463c9471cfab26a8b71cd2f50b6abf5225806391453da4ca111d1834fef.css" integrity="sha256-1Db0Y8lHHPqyaotxzS9Qtqv1IlgGORRT2kyhEdGDT&#43;8=">
+
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/Java-IO"><span>Java-IO</span>
+  </a>
+</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+  <ul>
+<li><a href="/Java-IO/">简介</a></li>
+<li><strong>BIO</strong></li>
+<li><a href="io/nio/">NIO</a>
+<ul>
+<li>Channel</li>
+<li><a href="io/nio/buffer/">Buffer</a></li>
+<li><a href="io/nio/selector/">Selector</a></li>
+</ul>
+</li>
+<li><strong>AIO</strong></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/Java-IO/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>Standard Socket Options</strong>
+
+  <label for="toc-control">
+    <img src="/Java-IO/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents"></nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h1 id="standardsocketoptions">StandardSocketOptions</h1>
+<p>TODO</p>
+<p><a href="https://blog.csdn.net/zero__007/article/details/51723434">https://blog.csdn.net/zero__007/article/details/51723434</a></p>
+<table>
+<thead>
+<tr>
+<th><strong>枚举值</strong></th>
+<th><strong>说明</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IP_MULTICAST_IF</td>
+<td>This option is used to specify the network interface (<strong>NetworkInterface</strong>) used for multicast datagrams sent by the datagram-oriented socket; if it is null, then the OS will choose the outgoing interface (if one is available). By default, it is null, but the option’s value can be set after the socket is bound. When we talk about sending datagrams, you will see how to find out what multicast interfaces are available on your machine.</td>
+</tr>
+<tr>
+<td>IP_MULTICAST_LOOP</td>
+<td>This option’s value is a boolean that controls the loopback of multicast datagrams (this is OS dependent). You have to decide, as the application writer, whether you want the data you send to be looped back to your host or not. By default, this is TRUE, but the option’s value can be set after the socket is bound.</td>
+</tr>
+<tr>
+<td>IP_MULTICAST_TTL</td>
+<td>This option’s value is an integer between 0 and 255, and it represents the time-to-live for multicast packets sent out by the datagram-oriented socket. If not otherwise specified, multicast datagrams are sent with a default value of 1, to prevent them to be forwarded beyond the local network. With this option we can control the scope of the multicast datagrams. By default this is set to 1, but the option’s value can be set after the socket is bound.</td>
+</tr>
+<tr>
+<td>IP_TOS</td>
+<td>This option’s value is an integer representing the value of the Type of Service (ToS) octet in IP packets sent by sockets—the interpretation of this value is specific to the network. Currently this is available only for IPv4, and by default its value is typically 0. The option’s value can be set any time after the socket is bound.</td>
+</tr>
+<tr>
+<td>SO_BROADCAST</td>
+<td>This option’s value it is a boolean that indicates if transmission of broadcast datagrams is allowed or not (specific to datagram-oriented sockets sending to IPv4 broadcast addresses). By default, it is FALSE, but the option’s value can be set any time.</td>
+</tr>
+<tr>
+<td>SO_KEEPALIVE</td>
+<td>This option’s value it is a boolean indicating if the connection should be kept alive or not. By default, it is set to FALSE, but the option’s value can be set any time.</td>
+</tr>
+<tr>
+<td>SO_LINGER</td>
+<td>This option’s value is an integer that represents a timeout in seconds (the linger interval). When attempting to close a blocking-mode socket via the close() method, it will wait for the duration of the linger interval before transmitting the unsent data (not defined for non-blocking mode). By default, it is a negative value, which means that this option is disabled. The option’s value can be set any time and the maximum value is OS dependent.</td>
+</tr>
+<tr>
+<td>SO_RCVBUF</td>
+<td>This option’s value is an integer that represents the size in bytes of the socket receive buffer—the input buffer used by the networking implementation. By default, the value is OS dependent, but it can be set before the socket is bound or connected. Depending on the OS, the value can be changed after the socket is bound. Negative values are not allowed.</td>
+</tr>
+<tr>
+<td>SO_SNDBUF</td>
+<td>This option’s value is an integer that represents the size in bytes of the socket send buffer—the output buffer used by the networking implementation. By default, the value is OS dependent, but it can be set before the socket is bound or connected. Depending on the OS, the value can be changed after the socket is bound. Negative values are not allowed.</td>
+</tr>
+<tr>
+<td>SO_REUSEADDR</td>
+<td>This option’s value is an integer that represents if an address can be reused or not. This is very useful in datagram multicasting when we want multiple programs to be bound to the same address. In the case of stream-oriented sockets, the socket can be bound to an address when a previous connection is in the TIME_WAIT state – TIME_WAIT means the OS has received a request to close the socket, but waits for possible late communications from the client side. By default, the option’s value is OS dependent, but it can be set before the socket is bound or connected.</td>
+</tr>
+<tr>
+<td>TCP_NODELAY</td>
+<td>This option’s value is an integer that enables/disables Nagle’s algorithm (for more information on Nagle’s algorithm, see <a href="http://en.wikipedia.org/wiki/Nagle%27s_algorithm)">http://en.wikipedia.org/wiki/Nagle%27s_algorithm)</a>. By default it is FALSE, but it can be set at any time.</td>
+</tr>
+</tbody>
+</table>
+<p><a href="https://blog.csdn.net/qq_33384065/article/details/78475245">https://blog.csdn.net/qq_33384065/article/details/78475245</a></p>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+  <div>
+    
+    <a class="flex align-center" href="https://github.com/hello-world-example/Java-IO/commit/72e3e0165e6f7af64f1132e09ea48fa9c9bb4563" title='Last modified by 杨凯彬 | Mar 2, 2020' target="_blank" rel="noopener">
+      <img src="/Java-IO/svg/calendar.svg" class="book-icon" alt="Calendar" />
+      <span>Mar 2, 2020</span>
+    </a>
+  </div>
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hello-world-example/Java-IO/edit/master/HuGo/content/docs/NIO/channel/StandardSocketOptions.md" target="_blank" rel="noopener">
+      <img src="/Java-IO/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        
+<script>
+var images = document.getElementsByTagName("img")
+console.info(images.length)
+for(var i=0; i<images.length; i++){
+  var image = images[i]
+  var src = image.getAttribute("src");
+  if(src.startsWith("-images")){
+    image.setAttribute("src", "../" + src)
+  }
+}
+</script>
+
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents"></nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

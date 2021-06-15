@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Buffer Buffer 用于和NIO Channel 进行交互，数据是从通道读入缓冲区，从缓冲区写入到通道中的。
+缓冲区本质上是一块可以读写数据的内存。这块内存被包装成NIO Buffer对象，并提供了一组方法，用来方便的访问该块内存。
+核心概念  position：表示当前位置的指针  初始值为 0，最大可为 Buffer 的大小 写数据时，每次写，position 会向后移 从写模式 切换到 读模式时，position 会被重置为 0，每次读，position 会向后移   limit  初始模式下 limit = capacity 写模式下 limit = capacity 切换读模式时，limit = position，position 重置为 0，limit 表示可以读数据的结束位置   capacity：Buffer 的固定大小值  常用方法  flip() 读写模式切换，limit = position，position 重置为 0 clear() 清空整个 Buffer，position=0 置为0、limit = capacity 为可写入的数据大小 compact() 只会清除已经读过的数据。任何未读的数据都被移到缓冲区的起始处，新写入的数据将放到缓冲区未读数据的后面。 mark() 标记一个 position 的位置，通过 reset() 恢复 position 位置 rewind() position 重置为 0，与flip() 的区别是 limit 不变，只重置 position，这样可以重新读 slice() 创建 [position,limit) 之间的子 Buffer，父子共享数据  "><meta property="og:title" content="" />
+<meta property="og:description" content="Buffer Buffer 用于和NIO Channel 进行交互，数据是从通道读入缓冲区，从缓冲区写入到通道中的。
+缓冲区本质上是一块可以读写数据的内存。这块内存被包装成NIO Buffer对象，并提供了一组方法，用来方便的访问该块内存。
+核心概念  position：表示当前位置的指针  初始值为 0，最大可为 Buffer 的大小 写数据时，每次写，position 会向后移 从写模式 切换到 读模式时，position 会被重置为 0，每次读，position 会向后移   limit  初始模式下 limit = capacity 写模式下 limit = capacity 切换读模式时，limit = position，position 重置为 0，limit 表示可以读数据的结束位置   capacity：Buffer 的固定大小值  常用方法  flip() 读写模式切换，limit = position，position 重置为 0 clear() 清空整个 Buffer，position=0 置为0、limit = capacity 为可写入的数据大小 compact() 只会清除已经读过的数据。任何未读的数据都被移到缓冲区的起始处，新写入的数据将放到缓冲区未读数据的后面。 mark() 标记一个 position 的位置，通过 reset() 恢复 position 位置 rewind() position 重置为 0，与flip() 的区别是 limit 不变，只重置 position，这样可以重新读 slice() 创建 [position,limit) 之间的子 Buffer，父子共享数据  " />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hello-world-example.github.io/Java-IO/docs/NIO/buffer/README/" />
+<meta property="article:modified_time" content="2020-03-02T18:22:05+08:00" />
+<title>R E a D M E | Java-IO</title>
+<link rel="icon" href="/Java-IO/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/Java-IO/book.min.d436f463c9471cfab26a8b71cd2f50b6abf5225806391453da4ca111d1834fef.css" integrity="sha256-1Db0Y8lHHPqyaotxzS9Qtqv1IlgGORRT2kyhEdGDT&#43;8=">
+
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/Java-IO"><span>Java-IO</span>
+  </a>
+</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+  <ul>
+<li><a href="/Java-IO/">简介</a></li>
+<li><strong>BIO</strong></li>
+<li><a href="io/nio/">NIO</a>
+<ul>
+<li>Channel</li>
+<li><a href="io/nio/buffer/">Buffer</a></li>
+<li><a href="io/nio/selector/">Selector</a></li>
+</ul>
+</li>
+<li><strong>AIO</strong></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/Java-IO/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>R E a D M E</strong>
+
+  <label for="toc-control">
+    <img src="/Java-IO/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents"></nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h1 id="buffer">Buffer</h1>
+<p>Buffer 用于和NIO Channel 进行交互，数据是从通道读入缓冲区，从缓冲区写入到通道中的。</p>
+<p>缓冲区本质上是一块可以读写数据的内存。这块内存被包装成NIO Buffer对象，并提供了一组方法，用来方便的访问该块内存。</p>
+<h1 id="核心概念">核心概念</h1>
+<ul>
+<li>position：表示当前位置的指针
+<ul>
+<li>初始值为 0，最大可为 Buffer 的大小</li>
+<li>写数据时，每次写，position 会向后移</li>
+<li>从写模式 切换到 读模式时，position 会被重置为 0，每次读，position 会向后移</li>
+</ul>
+</li>
+<li>limit
+<ul>
+<li>初始模式下 limit = capacity</li>
+<li>写模式下 limit = capacity</li>
+<li>切换读模式时，limit = position，position 重置为 0，limit 表示可以读数据的结束位置</li>
+</ul>
+</li>
+<li>capacity：Buffer 的固定大小值</li>
+</ul>
+<h1 id="常用方法">常用方法</h1>
+<ul>
+<li><code>flip()</code> 读写模式切换，limit = position，position 重置为 0</li>
+<li><code>clear()</code> 清空整个 Buffer，position=0 置为0、limit = capacity 为可写入的数据大小</li>
+<li><code>compact()</code> 只会清除已经读过的数据。任何未读的数据都被移到缓冲区的起始处，新写入的数据将放到缓冲区未读数据的后面。</li>
+<li><code>mark()</code> 标记一个 position 的位置，通过 <code>reset()</code> 恢复 position 位置</li>
+<li><code>rewind()</code> position 重置为 0，与<code>flip()</code> 的区别是 limit 不变，只重置 position，这样可以重新读</li>
+<li><code>slice()</code> 创建 <code>[position,limit)</code> 之间的子 Buffer，父子共享数据</li>
+</ul>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+  <div>
+    
+    <a class="flex align-center" href="https://github.com/hello-world-example/Java-IO/commit/72e3e0165e6f7af64f1132e09ea48fa9c9bb4563" title='Last modified by 杨凯彬 | Mar 2, 2020' target="_blank" rel="noopener">
+      <img src="/Java-IO/svg/calendar.svg" class="book-icon" alt="Calendar" />
+      <span>Mar 2, 2020</span>
+    </a>
+  </div>
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hello-world-example/Java-IO/edit/master/HuGo/content/docs/NIO/buffer/README.md" target="_blank" rel="noopener">
+      <img src="/Java-IO/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        
+<script>
+var images = document.getElementsByTagName("img")
+console.info(images.length)
+for(var i=0; i<images.length; i++){
+  var image = images[i]
+  var src = image.getAttribute("src");
+  if(src.startsWith("-images")){
+    image.setAttribute("src", "../" + src)
+  }
+}
+</script>
+
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents"></nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="简介 Java NIO: Channels and Buffers（通道和缓冲区） 标准的IO基于字节流和字符流进行操作的，而NIO是基于通道（Channel）和缓冲区（Buffer）进行操作，数据总是从通道读取到缓冲区中，或者从缓冲区写入到通道中。
+Java NIO: Non-blocking IO（非阻塞IO） Java NIO可以让你非阻塞的使用IO，例如：当线程从通道读取数据到缓冲区时，线程还是可以进行其他事情。当数据被写入到缓冲区时，线程可以继续处理它。从缓冲区写入通道也类似。
+Java NIO: Selectors（选择器） Java NIO引入了选择器的概念，选择器用于监听多个通道的事件（比如：连接打开，数据到达）。因此，单个的线程可以监听多个数据通道。
+Channel 下面是JAVA NIO中的一些主要Channel的实现：
+ FileChannel：从文件中读写数据。 DatagramChannel：能通过UDP读写网络中的数据。 SocketChannel：能通过TCP读写网络中的数据。 ServerSocketChannel：可以监听新进来的TCP连接，像Web服务器那样。对每一个新进来的连接都会创建一个SocketChannel。  正如你所看到的，这些通道涵盖了UDP 和 TCP 网络IO，以及文件IO。
+Buffer 以下是Java NIO里关键的Buffer实现：
+ ByteBuffer CharBuffer DoubleBuffer FloatBuffer IntBuffer LongBuffer ShortBuffer  这些Buffer覆盖了你能通过IO发送的基本数据类型：byte, short, int, long, float, double 和 char，没有 boolean。
+Java NIO 还有个 MappedByteBuffer，用于表示内存映射文件， 我也不打算在概述中说明。
+Selector Selector允许单线程处理多个 Channel。如果你的应用打开了多个连接（通道），但每个连接的流量都很低，使用Selector就会很方便。
+要使用Selector，得向Selector注册Channel，然后调用它的select()方法。这个方法会一直阻塞到某个注册的通道有事件就绪。一旦这个方法返回，线程就可以处理这些事件，事件的例子有如新连接进来，数据接收等。
+参考资料  原文： Java NIO系列教程（一） Java NIO 概述  "><meta property="og:title" content="" />
+<meta property="og:description" content="简介 Java NIO: Channels and Buffers（通道和缓冲区） 标准的IO基于字节流和字符流进行操作的，而NIO是基于通道（Channel）和缓冲区（Buffer）进行操作，数据总是从通道读取到缓冲区中，或者从缓冲区写入到通道中。
+Java NIO: Non-blocking IO（非阻塞IO） Java NIO可以让你非阻塞的使用IO，例如：当线程从通道读取数据到缓冲区时，线程还是可以进行其他事情。当数据被写入到缓冲区时，线程可以继续处理它。从缓冲区写入通道也类似。
+Java NIO: Selectors（选择器） Java NIO引入了选择器的概念，选择器用于监听多个通道的事件（比如：连接打开，数据到达）。因此，单个的线程可以监听多个数据通道。
+Channel 下面是JAVA NIO中的一些主要Channel的实现：
+ FileChannel：从文件中读写数据。 DatagramChannel：能通过UDP读写网络中的数据。 SocketChannel：能通过TCP读写网络中的数据。 ServerSocketChannel：可以监听新进来的TCP连接，像Web服务器那样。对每一个新进来的连接都会创建一个SocketChannel。  正如你所看到的，这些通道涵盖了UDP 和 TCP 网络IO，以及文件IO。
+Buffer 以下是Java NIO里关键的Buffer实现：
+ ByteBuffer CharBuffer DoubleBuffer FloatBuffer IntBuffer LongBuffer ShortBuffer  这些Buffer覆盖了你能通过IO发送的基本数据类型：byte, short, int, long, float, double 和 char，没有 boolean。
+Java NIO 还有个 MappedByteBuffer，用于表示内存映射文件， 我也不打算在概述中说明。
+Selector Selector允许单线程处理多个 Channel。如果你的应用打开了多个连接（通道），但每个连接的流量都很低，使用Selector就会很方便。
+要使用Selector，得向Selector注册Channel，然后调用它的select()方法。这个方法会一直阻塞到某个注册的通道有事件就绪。一旦这个方法返回，线程就可以处理这些事件，事件的例子有如新连接进来，数据接收等。
+参考资料  原文： Java NIO系列教程（一） Java NIO 概述  " />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hello-world-example.github.io/Java-IO/docs/NIO/README/" />
+<meta property="article:modified_time" content="2020-03-02T18:22:05+08:00" />
+<title>R E a D M E | Java-IO</title>
+<link rel="icon" href="/Java-IO/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/Java-IO/book.min.d436f463c9471cfab26a8b71cd2f50b6abf5225806391453da4ca111d1834fef.css" integrity="sha256-1Db0Y8lHHPqyaotxzS9Qtqv1IlgGORRT2kyhEdGDT&#43;8=">
+
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/Java-IO"><span>Java-IO</span>
+  </a>
+</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+  <ul>
+<li><a href="/Java-IO/">简介</a></li>
+<li><strong>BIO</strong></li>
+<li><a href="io/nio/">NIO</a>
+<ul>
+<li>Channel</li>
+<li><a href="io/nio/buffer/">Buffer</a></li>
+<li><a href="io/nio/selector/">Selector</a></li>
+</ul>
+</li>
+<li><strong>AIO</strong></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/Java-IO/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>R E a D M E</strong>
+
+  <label for="toc-control">
+    <img src="/Java-IO/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#java-nio-channels-and-buffers通道和缓冲区">Java NIO: Channels and Buffers（通道和缓冲区）</a></li>
+    <li><a href="#java-nio-non-blocking-io非阻塞io">Java NIO: Non-blocking IO（非阻塞IO）</a></li>
+    <li><a href="#java-nio-selectors选择器">Java NIO: Selectors（选择器）</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#selector">Selector</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h1 id="简介">简介</h1>
+<h2 id="java-nio-channels-and-buffers通道和缓冲区">Java NIO: Channels and Buffers（通道和缓冲区）</h2>
+<p>标准的IO基于字节流和字符流进行操作的，而NIO是基于通道（Channel）和缓冲区（Buffer）进行操作，数据总是从通道读取到缓冲区中，或者从缓冲区写入到通道中。</p>
+<h2 id="java-nio-non-blocking-io非阻塞io">Java NIO: Non-blocking IO（非阻塞IO）</h2>
+<p>Java NIO可以让你非阻塞的使用IO，例如：当线程从通道读取数据到缓冲区时，线程还是可以进行其他事情。当数据被写入到缓冲区时，线程可以继续处理它。从缓冲区写入通道也类似。</p>
+<h2 id="java-nio-selectors选择器">Java NIO: Selectors（选择器）</h2>
+<p>Java NIO引入了选择器的概念，选择器用于监听多个通道的事件（比如：连接打开，数据到达）。因此，单个的线程可以监听多个数据通道。</p>
+<h1 id="channel">Channel</h1>
+<p>下面是JAVA NIO中的一些主要Channel的实现：</p>
+<ul>
+<li>FileChannel：从文件中读写数据。</li>
+<li>DatagramChannel：能通过UDP读写网络中的数据。</li>
+<li>SocketChannel：能通过TCP读写网络中的数据。</li>
+<li>ServerSocketChannel：可以监听新进来的TCP连接，像Web服务器那样。对每一个新进来的连接都会创建一个SocketChannel。</li>
+</ul>
+<p>正如你所看到的，这些通道涵盖了UDP 和 TCP 网络IO，以及文件IO。</p>
+<h1 id="buffer">Buffer</h1>
+<p>以下是Java NIO里关键的Buffer实现：</p>
+<ul>
+<li>ByteBuffer</li>
+<li>CharBuffer</li>
+<li>DoubleBuffer</li>
+<li>FloatBuffer</li>
+<li>IntBuffer</li>
+<li>LongBuffer</li>
+<li>ShortBuffer</li>
+</ul>
+<p>这些Buffer覆盖了你能通过IO发送的基本数据类型：byte, short, int, long, float, double 和 char，没有 boolean。</p>
+<p>Java NIO 还有个 MappedByteBuffer，用于表示内存映射文件， 我也不打算在概述中说明。</p>
+<h2 id="selector">Selector</h2>
+<p>Selector允许单线程处理多个 Channel。如果你的应用打开了多个连接（通道），但每个连接的流量都很低，使用Selector就会很方便。</p>
+<p>要使用Selector，得向Selector注册Channel，然后调用它的select()方法。这个方法会一直阻塞到某个注册的通道有事件就绪。一旦这个方法返回，线程就可以处理这些事件，事件的例子有如新连接进来，数据接收等。</p>
+<h1 id="参考资料">参考资料</h1>
+<ul>
+<li>原文： <a href="http://ifeve.com/overview/">Java NIO系列教程（一） Java NIO 概述</a></li>
+</ul>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+  <div>
+    
+    <a class="flex align-center" href="https://github.com/hello-world-example/Java-IO/commit/72e3e0165e6f7af64f1132e09ea48fa9c9bb4563" title='Last modified by 杨凯彬 | Mar 2, 2020' target="_blank" rel="noopener">
+      <img src="/Java-IO/svg/calendar.svg" class="book-icon" alt="Calendar" />
+      <span>Mar 2, 2020</span>
+    </a>
+  </div>
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hello-world-example/Java-IO/edit/master/HuGo/content/docs/NIO/README.md" target="_blank" rel="noopener">
+      <img src="/Java-IO/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        
+<script>
+var images = document.getElementsByTagName("img")
+console.info(images.length)
+for(var i=0; i<images.length; i++){
+  var image = images[i]
+  var src = image.getAttribute("src");
+  if(src.startsWith("-images")){
+    image.setAttribute("src", "../" + src)
+  }
+}
+</script>
+
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#java-nio-channels-and-buffers通道和缓冲区">Java NIO: Channels and Buffers（通道和缓冲区）</a></li>
+    <li><a href="#java-nio-non-blocking-io非阻塞io">Java NIO: Non-blocking IO（非阻塞IO）</a></li>
+    <li><a href="#java-nio-selectors选择器">Java NIO: Selectors（选择器）</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#selector">Selector</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
