@@ -1,12 +1,17 @@
 # Selector
 
-Selector 能够检测一个或多个 Channel，知晓通道是否为事件做好准备。这样一个单独的线程可以管理多个Channel，从而管理多个网络连接。
 
-与 Selector 一起使用时，Channel 必须处于**非阻塞模式**下。这意味着**不能将 FileChannel 与 Selector 一起使用**，因为FileChannel 不能切换到非阻塞模式，而套接字通道都可以。
 
-# 核心概念
+- Selector 能够检测一个或多个 Channel，知晓通道是否为事件做好准备
+- 这样一个单独的线程可以管理多个Channel，从而管理多个网络连接
+- 与 Selector 一起使用时，Channel 必须处于**非阻塞模式**下
+- 这意味着**不能将 `FileChannel` 与 Selector 一起使用**，因为 `FileChannel` 不能切换到非阻塞模式，而套接字通道都可以
 
-## SelectionKey
+
+
+## 核心概念
+
+### SelectionKey
 
 SelectionKey 中四种事件常量，表示了在通过 Selector 监听 Channel 时，对什么事件感兴趣。通道触发了一个事件意思是该事件已经就绪。
 
@@ -25,7 +30,7 @@ int interestSet = SelectionKey.OP_READ | SelectionKey.OP_WRITE;
 
 
 
-# 示例
+## 示例
 
 ```java
 
@@ -33,7 +38,7 @@ int interestSet = SelectionKey.OP_READ | SelectionKey.OP_WRITE;
 
 
 
-# 参考资料
+## Read More
 
 - [Java NIO 之 Selector 练习](http://blog.51cto.com/xingej/1969782)
 

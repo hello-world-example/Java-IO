@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Selector  Selector 能够检测一个或多个 Channel，知晓通道是否为事件做好准备 这样一个单独的线程可以管理多个Channel，从而管理多个网络连接 与 Selector 一起使用时，Channel 必须处于非阻塞模式下 这意味着不能将 FileChannel 与 Selector 一起使用，因为 FileChannel 不能切换到非阻塞模式，而套接字通道都可以  核心概念 SelectionKey SelectionKey 中四种事件常量，表示了在通过 Selector 监听 Channel 时，对什么事件感兴趣。通道触发了一个事件意思是该事件已经就绪。
+ OP_CONNECT 某个 Channel 成功连接到另一个服务器称为**“连接就绪”** OP_ACCEPT ServerSocketChannel 准备好接收新进入的连接称为**“接收就绪”** OP_READ 有数据可读的通道是**“读就绪”** OP_WRITE 等待写数据的通道是**“写就绪”**  如果你对不止一种事件感兴趣，那么可以用“或”操作符将常量连接起来，如下：
+int interestSet = SelectionKey.OP_READ | SelectionKey.OP_WRITE; 示例 Read More  Java NIO 之 Selector 练习  "><meta property="og:title" content="" />
+<meta property="og:description" content="Selector  Selector 能够检测一个或多个 Channel，知晓通道是否为事件做好准备 这样一个单独的线程可以管理多个Channel，从而管理多个网络连接 与 Selector 一起使用时，Channel 必须处于非阻塞模式下 这意味着不能将 FileChannel 与 Selector 一起使用，因为 FileChannel 不能切换到非阻塞模式，而套接字通道都可以  核心概念 SelectionKey SelectionKey 中四种事件常量，表示了在通过 Selector 监听 Channel 时，对什么事件感兴趣。通道触发了一个事件意思是该事件已经就绪。
+ OP_CONNECT 某个 Channel 成功连接到另一个服务器称为**“连接就绪”** OP_ACCEPT ServerSocketChannel 准备好接收新进入的连接称为**“接收就绪”** OP_READ 有数据可读的通道是**“读就绪”** OP_WRITE 等待写数据的通道是**“写就绪”**  如果你对不止一种事件感兴趣，那么可以用“或”操作符将常量连接起来，如下：
+int interestSet = SelectionKey.OP_READ | SelectionKey.OP_WRITE; 示例 Read More  Java NIO 之 Selector 练习  " />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hello-world-example.github.io/Java-IO/docs/NIO/Selector/" />
+
+<title>Selector | Java-IO</title>
+<link rel="icon" href="/Java-IO/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/Java-IO/book.min.d436f463c9471cfab26a8b71cd2f50b6abf5225806391453da4ca111d1834fef.css" integrity="sha256-1Db0Y8lHHPqyaotxzS9Qtqv1IlgGORRT2kyhEdGDT&#43;8=">
+
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/Java-IO"><span>Java-IO</span>
+  </a>
+</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+  <ul>
+<li><a href="/Java-IO/docs/NIO/"><strong>NIO</strong></a>
+<ul>
+<li><a href="/Java-IO/docs/NIO/Buffer/">Buffer</a></li>
+<li><a href="/Java-IO/docs/NIO/Selector/"class=active>Selector</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/Java-IO/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>Selector</strong>
+
+  <label for="toc-control">
+    <img src="/Java-IO/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#核心概念">核心概念</a>
+      <ul>
+        <li><a href="#selectionkey">SelectionKey</a></li>
+      </ul>
+    </li>
+    <li><a href="#示例">示例</a></li>
+    <li><a href="#read-more">Read More</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h1 id="selector">Selector</h1>
+<ul>
+<li>Selector 能够检测一个或多个 Channel，知晓通道是否为事件做好准备</li>
+<li>这样一个单独的线程可以管理多个Channel，从而管理多个网络连接</li>
+<li>与 Selector 一起使用时，Channel 必须处于<strong>非阻塞模式</strong>下</li>
+<li>这意味着<strong>不能将 <code>FileChannel</code> 与 Selector 一起使用</strong>，因为 <code>FileChannel</code> 不能切换到非阻塞模式，而套接字通道都可以</li>
+</ul>
+<h2 id="核心概念">核心概念</h2>
+<h3 id="selectionkey">SelectionKey</h3>
+<p>SelectionKey 中四种事件常量，表示了在通过 Selector 监听 Channel 时，对什么事件感兴趣。通道触发了一个事件意思是该事件已经就绪。</p>
+<ul>
+<li><code>OP_CONNECT</code> 某个 Channel 成功连接到另一个服务器称为**“连接就绪”**</li>
+<li><code>OP_ACCEPT</code> ServerSocketChannel 准备好接收新进入的连接称为**“接收就绪”**</li>
+<li><code>OP_READ</code> 有数据可读的通道是**“读就绪”**</li>
+<li><code>OP_WRITE</code> 等待写数据的通道是**“写就绪”**</li>
+</ul>
+<p>如果你对不止一种事件感兴趣，那么可以用“或”操作符将常量连接起来，如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">int</span> interestSet <span style="color:#f92672">=</span> SelectionKey<span style="color:#f92672">.</span><span style="color:#a6e22e">OP_READ</span> <span style="color:#f92672">|</span> SelectionKey<span style="color:#f92672">.</span><span style="color:#a6e22e">OP_WRITE</span><span style="color:#f92672">;</span>
+</code></pre></div><h2 id="示例">示例</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">
+</code></pre></div><h2 id="read-more">Read More</h2>
+<ul>
+<li><a href="http://blog.51cto.com/xingej/1969782">Java NIO 之 Selector 练习</a></li>
+</ul>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hello-world-example/Java-IO/edit/master/HuGo/content/docs/NIO/Selector.md" target="_blank" rel="noopener">
+      <img src="/Java-IO/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        
+<script>
+var images = document.getElementsByTagName("img")
+console.info(images.length)
+for(var i=0; i<images.length; i++){
+  var image = images[i]
+  var src = image.getAttribute("src");
+  if(src.startsWith("-images")){
+    image.setAttribute("src", "../" + src)
+  }
+}
+</script>
+
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#核心概念">核心概念</a>
+      <ul>
+        <li><a href="#selectionkey">SelectionKey</a></li>
+      </ul>
+    </li>
+    <li><a href="#示例">示例</a></li>
+    <li><a href="#read-more">Read More</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
