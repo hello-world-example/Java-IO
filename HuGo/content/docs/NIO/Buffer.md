@@ -10,12 +10,15 @@ Buffer 用于和 NIO Channel 进行交互，数据是从通道读入缓冲区，
 
 ## 核心概念
 
+
+
 - `position`：表示当前位置的指针
-  
   - 初始值为 0，最大可为 Buffer 的大小 
   - 写数据时，每次写，position 会向后移
   - 从写模式 切换到 读模式时，position 会被重置为 0，每次读，position 会向后移
-  
+
+
+
 - `limit`
   
   - 初始模式下 limit = capacity
