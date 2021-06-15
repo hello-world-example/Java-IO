@@ -18,7 +18,7 @@
   常用方法  flip() 读写模式切换，limit = position，position 重置为 0 clear() 清空整个 Buffer，position=0 置为0、limit = capacity 为可写入的数据大小 compact() 只会清除已经读过的数据。任何未读的数据都被移到缓冲区的起始处，新写入的数据将放到缓冲区未读数据的后面。 mark() 标记一个 position 的位置，通过 reset() 恢复 position 位置 rewind() position 重置为 0，与flip() 的区别是 limit 不变，只重置 position，这样可以重新读 slice() 创建 [position,limit) 之间的子 Buffer，父子共享数据  " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hello-world-example.github.io/Java-IO/docs/NIO/Buffer/" />
-
+<meta property="article:modified_time" content="2021-06-15T16:26:59+08:00" />
 <title>Buffer | Java-IO</title>
 <link rel="icon" href="/Java-IO/favicon.png" type="image/x-icon">
 
@@ -163,6 +163,14 @@ https://github.com/alex-shpak/hugo-book
   <div class="flex justify-between">
 
 
+
+  <div>
+    
+    <a class="flex align-center" href="https://github.com/hello-world-example/Java-IO/commit/20627e8460736931dcdc4393077aa3907ea33160" title='Last modified by kaibin.yang | Jun 15, 2021' target="_blank" rel="noopener">
+      <img src="/Java-IO/svg/calendar.svg" class="book-icon" alt="Calendar" />
+      <span>Jun 15, 2021</span>
+    </a>
+  </div>
 
 
 

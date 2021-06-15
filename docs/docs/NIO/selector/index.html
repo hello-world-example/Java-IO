@@ -5,14 +5,14 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Selector  Selector 能够检测一个或多个 Channel，知晓通道是否为事件做好准备 这样一个单独的线程可以管理多个Channel，从而管理多个网络连接 与 Selector 一起使用时，Channel 必须处于非阻塞模式下 这意味着不能将 FileChannel 与 Selector 一起使用，因为 FileChannel 不能切换到非阻塞模式，而套接字通道都可以  核心概念 SelectionKey SelectionKey 中四种事件常量，表示了在通过 Selector 监听 Channel 时，对什么事件感兴趣。通道触发了一个事件意思是该事件已经就绪。
- OP_CONNECT 某个 Channel 成功连接到另一个服务器称为**“连接就绪”** OP_ACCEPT ServerSocketChannel 准备好接收新进入的连接称为**“接收就绪”** OP_READ 有数据可读的通道是**“读就绪”** OP_WRITE 等待写数据的通道是**“写就绪”**  如果你对不止一种事件感兴趣，那么可以用“或”操作符将常量连接起来，如下：
+ OP_CONNECT ： 某个 Channel 成功连接到另一个服务器称为**“连接就绪”** OP_ACCEPT ： ServerSocketChannel 准备好接收新进入的连接称为**“接收就绪”** OP_READ ： 有数据可读的通道是**“读就绪”** OP_WRITE ： 等待写数据的通道是**“写就绪”**  如果你对不止一种事件感兴趣，那么可以用 | 操作符将常量连接起来，如下：
 int interestSet = SelectionKey.OP_READ | SelectionKey.OP_WRITE; 示例 Read More  Java NIO 之 Selector 练习  "><meta property="og:title" content="" />
 <meta property="og:description" content="Selector  Selector 能够检测一个或多个 Channel，知晓通道是否为事件做好准备 这样一个单独的线程可以管理多个Channel，从而管理多个网络连接 与 Selector 一起使用时，Channel 必须处于非阻塞模式下 这意味着不能将 FileChannel 与 Selector 一起使用，因为 FileChannel 不能切换到非阻塞模式，而套接字通道都可以  核心概念 SelectionKey SelectionKey 中四种事件常量，表示了在通过 Selector 监听 Channel 时，对什么事件感兴趣。通道触发了一个事件意思是该事件已经就绪。
- OP_CONNECT 某个 Channel 成功连接到另一个服务器称为**“连接就绪”** OP_ACCEPT ServerSocketChannel 准备好接收新进入的连接称为**“接收就绪”** OP_READ 有数据可读的通道是**“读就绪”** OP_WRITE 等待写数据的通道是**“写就绪”**  如果你对不止一种事件感兴趣，那么可以用“或”操作符将常量连接起来，如下：
+ OP_CONNECT ： 某个 Channel 成功连接到另一个服务器称为**“连接就绪”** OP_ACCEPT ： ServerSocketChannel 准备好接收新进入的连接称为**“接收就绪”** OP_READ ： 有数据可读的通道是**“读就绪”** OP_WRITE ： 等待写数据的通道是**“写就绪”**  如果你对不止一种事件感兴趣，那么可以用 | 操作符将常量连接起来，如下：
 int interestSet = SelectionKey.OP_READ | SelectionKey.OP_WRITE; 示例 Read More  Java NIO 之 Selector 练习  " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hello-world-example.github.io/Java-IO/docs/NIO/Selector/" />
-
+<meta property="article:modified_time" content="2021-06-15T23:11:02+08:00" />
 <title>Selector | Java-IO</title>
 <link rel="icon" href="/Java-IO/favicon.png" type="image/x-icon">
 
@@ -130,12 +130,12 @@ https://github.com/alex-shpak/hugo-book
 <h3 id="selectionkey">SelectionKey</h3>
 <p>SelectionKey 中四种事件常量，表示了在通过 Selector 监听 Channel 时，对什么事件感兴趣。通道触发了一个事件意思是该事件已经就绪。</p>
 <ul>
-<li><code>OP_CONNECT</code> 某个 Channel 成功连接到另一个服务器称为**“连接就绪”**</li>
-<li><code>OP_ACCEPT</code> ServerSocketChannel 准备好接收新进入的连接称为**“接收就绪”**</li>
-<li><code>OP_READ</code> 有数据可读的通道是**“读就绪”**</li>
-<li><code>OP_WRITE</code> 等待写数据的通道是**“写就绪”**</li>
+<li><code>OP_CONNECT</code> ： 某个 <code>Channel</code> 成功连接到另一个服务器称为**“连接就绪”**</li>
+<li><code>OP_ACCEPT</code> ： <code>ServerSocketChannel</code> 准备好接收新进入的连接称为**“接收就绪”**</li>
+<li><code>OP_READ</code> ： 有数据可读的通道是**“读就绪”**</li>
+<li><code>OP_WRITE</code> ： 等待写数据的通道是**“写就绪”**</li>
 </ul>
-<p>如果你对不止一种事件感兴趣，那么可以用“或”操作符将常量连接起来，如下：</p>
+<p>如果你对不止一种事件感兴趣，那么可以用 <code>|</code> 操作符将常量连接起来，如下：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">int</span> interestSet <span style="color:#f92672">=</span> SelectionKey<span style="color:#f92672">.</span><span style="color:#a6e22e">OP_READ</span> <span style="color:#f92672">|</span> SelectionKey<span style="color:#f92672">.</span><span style="color:#a6e22e">OP_WRITE</span><span style="color:#f92672">;</span>
 </code></pre></div><h2 id="示例">示例</h2>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">
@@ -152,6 +152,14 @@ https://github.com/alex-shpak/hugo-book
   <div class="flex justify-between">
 
 
+
+  <div>
+    
+    <a class="flex align-center" href="https://github.com/hello-world-example/Java-IO/commit/f14ed1ead20aa60d54f0e81f7fe69fda5f85e9fa" title='Last modified by kaibin.yang | Jun 15, 2021' target="_blank" rel="noopener">
+      <img src="/Java-IO/svg/calendar.svg" class="book-icon" alt="Calendar" />
+      <span>Jun 15, 2021</span>
+    </a>
+  </div>
 
 
 
