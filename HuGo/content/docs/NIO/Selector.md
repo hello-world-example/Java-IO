@@ -15,12 +15,14 @@
 
 SelectionKey 中四种事件常量，表示了在通过 Selector 监听 Channel 时，对什么事件感兴趣。通道触发了一个事件意思是该事件已经就绪。
 
-- `OP_CONNECT` 某个 Channel 成功连接到另一个服务器称为**“连接就绪”**
-- `OP_ACCEPT` ServerSocketChannel 准备好接收新进入的连接称为**“接收就绪”**
-- `OP_READ` 有数据可读的通道是**“读就绪”**
-- `OP_WRITE` 等待写数据的通道是**“写就绪”**
+- `OP_CONNECT` ： 某个 `Channel` 成功连接到另一个服务器称为**“连接就绪”**
+- `OP_ACCEPT` ： `ServerSocketChannel` 准备好接收新进入的连接称为**“接收就绪”**
+- `OP_READ` ： 有数据可读的通道是**“读就绪”**
+- `OP_WRITE` ： 等待写数据的通道是**“写就绪”**
 
-如果你对不止一种事件感兴趣，那么可以用“或”操作符将常量连接起来，如下：
+
+
+如果你对不止一种事件感兴趣，那么可以用 `|` 操作符将常量连接起来，如下：
 
 ```java
 int interestSet = SelectionKey.OP_READ | SelectionKey.OP_WRITE;

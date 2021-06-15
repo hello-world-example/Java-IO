@@ -13,6 +13,7 @@
         <module>demo-java-bio</module>
         <module>demo-java-aio</module>
         <module>demo-java-drawio</module>
+        <module>java-io-tools</module>
     </modules>
 
 
