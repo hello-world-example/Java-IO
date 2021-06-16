@@ -12,3 +12,7 @@ if [[ $CUR_ORIGIN == *gitee.com* ]]; then
 fi
 
 echo "已切换为：$(git remote get-url origin)"
+
+if [ -n "$1" ]; then
+  git $1
+fi
