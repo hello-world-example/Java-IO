@@ -8,7 +8,7 @@
 <meta property="og:description" content="Channel  标准的 IO 基于 字节流 和 字符流 进行操作，而 NIO 是基于 通道（Channel）和 缓冲区（Buffer） 进行操作  FileChannel FileLock   lock() 阻塞，锁定范围可以随着文件的增大而增加，默认为独占锁； tryLock() 非阻塞，当未获得锁时，返回 null      方法 说明     lock() 整个文件的独占锁定   lock(long position,long size,boolean shared) 文件指定区域上的锁定，共享锁   tryLock() throws IOException 试图获取 整个文件的独占锁定   tryLock(long position,long size,boolean shared) throws IOException 试图获取 文件指定区域上的锁定，共享锁   release() 释放锁   close() =&gt; try (final FileLock lock = fileChannel." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hello-world-example.github.io/Java-IO/docs/NIO/Channel/" />
-
+<meta property="article:modified_time" content="2021-06-18T17:17:02+08:00" />
 <title>Channel | Java-IO</title>
 <link rel="icon" href="/Java-IO/favicon.png" type="image/x-icon">
 
@@ -50,6 +50,7 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/Java-IO/docs/Network-IO-Model/">5 种 IO 模型</a></li>
 <li><a href="/Java-IO/docs/IO-Multiplexing-Type/">IO 多路复用</a></li>
 <li><a href="/Java-IO/docs/Zero-Copy/">零拷贝技术</a></li>
+<li><a href="/Java-IO/docs/Reactor-and-Proactor/">Reactor 和 Proactor</a></li>
 <li><a href="/Java-IO/docs/NIO/"><strong>NIO</strong></a>
 <ul>
 <li><a href="/Java-IO/docs/NIO/Buffer/">Buffer</a></li>
@@ -187,6 +188,14 @@ https://github.com/alex-shpak/hugo-book
   <div class="flex justify-between">
 
 
+
+  <div>
+    
+    <a class="flex align-center" href="https://github.com/hello-world-example/Java-IO/commit/db36ddf70d87c5b7316c5ccb1185fe93847db56a" title='Last modified by kaibin.yang | Jun 18, 2021' target="_blank" rel="noopener">
+      <img src="/Java-IO/svg/calendar.svg" class="book-icon" alt="Calendar" />
+      <span>Jun 18, 2021</span>
+    </a>
+  </div>
 
 
 

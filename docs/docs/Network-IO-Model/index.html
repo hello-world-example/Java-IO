@@ -12,7 +12,7 @@
 1. (同步)阻塞I/O (Blocking I/O)  在 IO 执行的两个阶段中，进程都处于 blocked(阻塞) 状态，在等待数据返回的过程中不能做其他的工作，只能阻塞的等在那里 优点：简单，实时性高，响应及时无延时 缺点：需要阻塞等待，性能差  2. (同步)非阻塞I/O (Non-Blocking I/O)  与阻塞式 I/O 不同的是，非阻塞系统调用调用之后，进程并没有被阻塞，内核马上返回给进程一个状态 采用轮询的方式检查内核数据，直到数据准备好，再拷贝数据到进程，进行数据处理 优点：能够在等待任务完成的时间里干其他活 缺点：任务完成的响应延迟增大，导致整体数据吞吐量的降低  3." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hello-world-example.github.io/Java-IO/docs/Network-IO-Model/" />
-
+<meta property="article:modified_time" content="2021-06-18T17:17:02+08:00" />
 <title>Network I O Model | Java-IO</title>
 <link rel="icon" href="/Java-IO/favicon.png" type="image/x-icon">
 
@@ -54,6 +54,7 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/Java-IO/docs/Network-IO-Model/"class=active>5 种 IO 模型</a></li>
 <li><a href="/Java-IO/docs/IO-Multiplexing-Type/">IO 多路复用</a></li>
 <li><a href="/Java-IO/docs/Zero-Copy/">零拷贝技术</a></li>
+<li><a href="/Java-IO/docs/Reactor-and-Proactor/">Reactor 和 Proactor</a></li>
 <li><a href="/Java-IO/docs/NIO/"><strong>NIO</strong></a>
 <ul>
 <li><a href="/Java-IO/docs/NIO/Buffer/">Buffer</a></li>
@@ -196,6 +197,14 @@ https://github.com/alex-shpak/hugo-book
   <div class="flex justify-between">
 
 
+
+  <div>
+    
+    <a class="flex align-center" href="https://github.com/hello-world-example/Java-IO/commit/db36ddf70d87c5b7316c5ccb1185fe93847db56a" title='Last modified by kaibin.yang | Jun 18, 2021' target="_blank" rel="noopener">
+      <img src="/Java-IO/svg/calendar.svg" class="book-icon" alt="Calendar" />
+      <span>Jun 18, 2021</span>
+    </a>
+  </div>
 
 
 

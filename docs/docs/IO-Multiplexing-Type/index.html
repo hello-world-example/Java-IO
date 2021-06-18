@@ -8,7 +8,7 @@
 <meta property="og:description" content="IO 多路复用技术  select、 poll、epoll 都是 阻塞调用 多路：多个 Socket 套接字 复用：同一个进程、线程  select（O(n)） // 当 select 函数返回后，可以通过遍历 fdset，来找到就绪的描述符 int select( int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout // 等待时间，如果立即返回设为 null )  select 最大的缺陷就是打开的 FD 是有一定限制的  可以通过多进程的方式突破限制（Apached），但是仍然有以下问题   扫描时是线性扫描，即采用轮询的方法，效率较低 需要把 FD 集合从用户态拷贝到内核态，在 FD 很多时会开销很大    [关于 select 中 fd 限制问题] → define __FD_SETSIZE 1024 [为什么select打开的FD数量有限制，而poll、epoll等打开的FD数量没有限制]   poll（O(n)）  基于链表来存储，没有最大连接数的限制 select 和 poll 都需要在返回后，通过遍历文件描述符来获取已经就绪的 socket，随着监视的描述符数量的增长，其效率也会线性下降 需要将用户传入的数组拷贝到内核空间，然后查询每个fd对应的设备状态，不管这样的复制是不是有意义  epoll（O(1)）  在Linux 内核 2." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hello-world-example.github.io/Java-IO/docs/IO-Multiplexing-Type/" />
-
+<meta property="article:modified_time" content="2021-06-18T17:17:02+08:00" />
 <title>I O Multiplexing Type | Java-IO</title>
 <link rel="icon" href="/Java-IO/favicon.png" type="image/x-icon">
 
@@ -50,6 +50,7 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/Java-IO/docs/Network-IO-Model/">5 种 IO 模型</a></li>
 <li><a href="/Java-IO/docs/IO-Multiplexing-Type/"class=active>IO 多路复用</a></li>
 <li><a href="/Java-IO/docs/Zero-Copy/">零拷贝技术</a></li>
+<li><a href="/Java-IO/docs/Reactor-and-Proactor/">Reactor 和 Proactor</a></li>
 <li><a href="/Java-IO/docs/NIO/"><strong>NIO</strong></a>
 <ul>
 <li><a href="/Java-IO/docs/NIO/Buffer/">Buffer</a></li>
@@ -209,6 +210,14 @@ https://github.com/alex-shpak/hugo-book
   <div class="flex justify-between">
 
 
+
+  <div>
+    
+    <a class="flex align-center" href="https://github.com/hello-world-example/Java-IO/commit/db36ddf70d87c5b7316c5ccb1185fe93847db56a" title='Last modified by kaibin.yang | Jun 18, 2021' target="_blank" rel="noopener">
+      <img src="/Java-IO/svg/calendar.svg" class="book-icon" alt="Calendar" />
+      <span>Jun 18, 2021</span>
+    </a>
+  </div>
 
 
 

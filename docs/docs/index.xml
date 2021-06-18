@@ -31,6 +31,17 @@
     
     <item>
       <title></title>
+      <link>https://hello-world-example.github.io/Java-IO/docs/Reactor-and-Proactor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://hello-world-example.github.io/Java-IO/docs/Reactor-and-Proactor/</guid>
+      <description>Reactor 和 Proactor 模型  本文来自：理解高性能网络模型
+ 阻塞 I/O 模型  特点  每个连接都需要独立的线程 完成数据输入、业务处理、数据返回   存在问题  当并发数较大时，需要创建大量线程来处理连接，系统资源占用较大 连接建立后，如果当前线程暂时没有数据可读，则线程就阻塞在 read 操作上，造成线程资源浪费    Reactor 模型  Reactor 翻译过来的意思是 反应堆，即对事件反应 Reactor 模式也叫 Dispatcher 模式，即 I/O 多路复用监听事件，收到事件后根据事件类型分配（Dispatch）给某个线程 I/O复用 + 线程池，这就是 Reactor 模式基本设计思想    Reactor 模式主要由 Reactor 和 处理资源池 这两个核心部分组成：
+ Reactor 负责监听和分发事件，事件类型包含连接事件、读写事件； 处理资源池 负责处理事件，如 read -&amp;gt; 业务逻辑 -&amp;gt; send；    根据 Reactor 数量 和 处理资源池线程的数量 不同，有 3种 典型的实现：</description>
+    </item>
+    
+    <item>
+      <title></title>
       <link>https://hello-world-example.github.io/Java-IO/docs/Zero-Copy/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
