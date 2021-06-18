@@ -9,13 +9,15 @@
 核心概念   position：表示当前位置的指针
  初始值为 0，最大可为 Buffer 的大小 写数据时，每次写，position 会向后移 从写模式 切换到 读模式时，position 会被重置为 0，每次读，position 会向后移    limit
  初始模式下 limit = capacity 写模式下 limit = capacity 切换读模式时，limit = position，position 重置为 0，limit 表示可以读数据的结束位置    capacity：Buffer 的固定大小值
-  常用方法  flip() 读写模式切换，limit = position，position 重置为 0 clear() 清空整个 Buffer，position=0 置为0、limit = capacity 为可写入的数据大小 compact() 只会清除已经读过的数据。任何未读的数据都被移到缓冲区的起始处，新写入的数据将放到缓冲区未读数据的后面。 mark() 标记一个 position 的位置，通过 reset() 恢复 position 位置 rewind() position 重置为 0，与flip() 的区别是 limit 不变，只重置 position，这样可以重新读 slice() 创建 [position,limit) 之间的子 Buffer，父子共享数据  "><meta property="og:title" content="" />
+  0 &lt;= position &lt;= limit &lt;= capacity
+  常用方法   flip() 写模式切换到读模式，limit = position，position 重置为 0"><meta property="og:title" content="" />
 <meta property="og:description" content="Buffer Buffer 用于和 NIO Channel 进行交互，数据是从通道读入缓冲区，从缓冲区写入到通道中的。
 缓冲区本质上是一块可以读写数据的内存。这块内存被包装成 NIO Buffer 对象，并提供了一组方法，用来方便的访问该块内存。
 核心概念   position：表示当前位置的指针
  初始值为 0，最大可为 Buffer 的大小 写数据时，每次写，position 会向后移 从写模式 切换到 读模式时，position 会被重置为 0，每次读，position 会向后移    limit
  初始模式下 limit = capacity 写模式下 limit = capacity 切换读模式时，limit = position，position 重置为 0，limit 表示可以读数据的结束位置    capacity：Buffer 的固定大小值
-  常用方法  flip() 读写模式切换，limit = position，position 重置为 0 clear() 清空整个 Buffer，position=0 置为0、limit = capacity 为可写入的数据大小 compact() 只会清除已经读过的数据。任何未读的数据都被移到缓冲区的起始处，新写入的数据将放到缓冲区未读数据的后面。 mark() 标记一个 position 的位置，通过 reset() 恢复 position 位置 rewind() position 重置为 0，与flip() 的区别是 limit 不变，只重置 position，这样可以重新读 slice() 创建 [position,limit) 之间的子 Buffer，父子共享数据  " />
+  0 &lt;= position &lt;= limit &lt;= capacity
+  常用方法   flip() 写模式切换到读模式，limit = position，position 重置为 0" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hello-world-example.github.io/Java-IO/docs/NIO/Buffer/" />
 <meta property="article:modified_time" content="2021-06-15T16:26:59+08:00" />
@@ -23,7 +25,7 @@
 <link rel="icon" href="/Java-IO/favicon.png" type="image/x-icon">
 
 
-<link rel="stylesheet" href="/Java-IO/book.min.d436f463c9471cfab26a8b71cd2f50b6abf5225806391453da4ca111d1834fef.css" integrity="sha256-1Db0Y8lHHPqyaotxzS9Qtqv1IlgGORRT2kyhEdGDT&#43;8=">
+<link rel="stylesheet" href="/Java-IO/book.min.00b8e784201abfe629a6e0741e94bf44575af8612aec171d94e4ecbd3692cf5c.css" integrity="sha256-ALjnhCAav&#43;YppuB0HpS/RFda&#43;GEq7BcdlOTsvTaSz1w=">
 
 
 <!--
@@ -57,12 +59,17 @@ https://github.com/alex-shpak/hugo-book
 
 
   <ul>
+<li><a href="/Java-IO/docs/Network-IO-Model/">5 种 IO 模型</a></li>
+<li><a href="/Java-IO/docs/IO-Multiplexing-Type/">IO 多路复用</a></li>
+<li><a href="/Java-IO/docs/Zero-Copy/">零拷贝技术</a></li>
 <li><a href="/Java-IO/docs/NIO/"><strong>NIO</strong></a>
 <ul>
 <li><a href="/Java-IO/docs/NIO/Buffer/"class=active>Buffer</a></li>
+<li><a href="/Java-IO/docs/NIO/Channel/">Channel</a></li>
 <li><a href="/Java-IO/docs/NIO/Selector/">Selector</a></li>
 </ul>
 </li>
+<li><a href="/Network"><strong>Network</strong>🔗 </a></li>
 </ul>
 
 
@@ -109,6 +116,7 @@ https://github.com/alex-shpak/hugo-book
   <ul>
     <li><a href="#核心概念">核心概念</a></li>
     <li><a href="#常用方法">常用方法</a></li>
+    <li><a href="#read-more">Read More</a></li>
   </ul>
 </nav>
 
@@ -123,6 +131,7 @@ https://github.com/alex-shpak/hugo-book
   <article class="markdown"><h1 id="buffer">Buffer</h1>
 <p>Buffer 用于和 NIO Channel 进行交互，数据是从通道读入缓冲区，从缓冲区写入到通道中的。</p>
 <p>缓冲区本质上是一块可以读写数据的内存。这块内存被包装成 NIO Buffer 对象，并提供了一组方法，用来方便的访问该块内存。</p>
+<p><img src="-images/Buffer-%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84.png" alt="Buffer-数据结构.png" /></p>
 <h2 id="核心概念">核心概念</h2>
 <ul>
 <li>
@@ -144,15 +153,39 @@ https://github.com/alex-shpak/hugo-book
 <li>
 <p><code>capacity</code>：Buffer 的固定大小值</p>
 </li>
+<li>
+<p><code>0 &lt;= position &lt;= limit &lt;= capacity</code></p>
+</li>
 </ul>
 <h2 id="常用方法">常用方法</h2>
 <ul>
-<li><code>flip()</code> 读写模式切换，limit = position，position 重置为 0</li>
-<li><code>clear()</code> 清空整个 Buffer，position=0 置为0、limit = capacity 为可写入的数据大小</li>
-<li><code>compact()</code> 只会清除已经读过的数据。任何未读的数据都被移到缓冲区的起始处，新写入的数据将放到缓冲区未读数据的后面。</li>
-<li><code>mark()</code> 标记一个 position 的位置，通过 <code>reset()</code> 恢复 position 位置</li>
-<li><code>rewind()</code> position 重置为 0，与<code>flip()</code> 的区别是 limit 不变，只重置 position，这样可以重新读</li>
-<li><code>slice()</code> 创建 <code>[position,limit)</code> 之间的子 Buffer，父子共享数据</li>
+<li>
+<p><code>flip()</code> 写模式切换到读模式，limit = position，position 重置为 0</p>
+</li>
+<li>
+<p><code>rewind()</code> position 重置为 0，与<code>flip()</code> 的区别是 limit 不变，只重置 position，这样可以重新读</p>
+</li>
+<li>
+<p><code>mark()</code> 标记 position 的位置</p>
+</li>
+<li>
+<p><code>reset()</code> 恢复 position 位置</p>
+</li>
+<li>
+<p><code>clear()</code> 清空整个 Buffer，position=0 置为0、limit = capacity 为可写入的数据大小</p>
+</li>
+<li>
+<p><code>compact()</code> 只会清除已经读过的数据。任何未读的数据都被移到缓冲区的起始处，新写入的数据将放到缓冲区未读数据的后面。</p>
+</li>
+<li>
+<p><code>slice()</code> 创建 <code>[position,limit)</code> 之间的子 Buffer，父子共享数据</p>
+</li>
+</ul>
+<h2 id="read-more">Read More</h2>
+<ul>
+<li><a href="https://github.com/hello-world-example/Java-IO/tree/master/demo-java-nio/src/main/java/xyz/kail/demo/java/io">NIO Example</a></li>
+<li></li>
+<li><a href="https://mp.weixin.qq.com/s/jeuISFEh49aUheFsX_aHMg">NIO相关基础篇 一</a></li>
 </ul>
 </article>
  
@@ -184,17 +217,19 @@ https://github.com/alex-shpak/hugo-book
 </div>
 
  
-        
-<script>
-var images = document.getElementsByTagName("img")
-console.info(images.length)
-for(var i=0; i<images.length; i++){
-  var image = images[i]
-  var src = image.getAttribute("src");
-  if(src.startsWith("-images")){
-    image.setAttribute("src", "../" + src)
-  }
-}
+        <script>
+    var images = document.getElementsByTagName("img")
+    console.info(images.length)
+    for (var i = 0; i < images.length; i++) {
+        var image = images[i]
+        var src = image.getAttribute("src");
+        if (src.startsWith("-images")) {
+            image.setAttribute("src", "../" + src);
+        }
+        image.onclick = function () {
+            window.open(this.getAttribute("src"))
+        }
+    }
 </script>
 
       </footer>
@@ -217,6 +252,7 @@ for(var i=0; i<images.length; i++){
   <ul>
     <li><a href="#核心概念">核心概念</a></li>
     <li><a href="#常用方法">常用方法</a></li>
+    <li><a href="#read-more">Read More</a></li>
   </ul>
 </nav>
 

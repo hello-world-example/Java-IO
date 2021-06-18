@@ -15,7 +15,27 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://hello-world-example.github.io/Java-IO/_sidebar/</guid>
-      <description> NIO  Buffer Selector    </description>
+      <description> 5 种 IO 模型 IO 多路复用 零拷贝技术 NIO  Buffer Channel Selector   Network🔗   </description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://hello-world-example.github.io/Java-IO/docs/IO-Multiplexing-Type/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://hello-world-example.github.io/Java-IO/docs/IO-Multiplexing-Type/</guid>
+      <description>IO 多路复用技术  select、 poll、epoll 都是 阻塞调用 多路：多个 Socket 套接字 复用：同一个进程、线程  select（O(n)） // 当 select 函数返回后，可以通过遍历 fdset，来找到就绪的描述符 int select( int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout // 等待时间，如果立即返回设为 null )  select 最大的缺陷就是打开的 FD 是有一定限制的  可以通过多进程的方式突破限制（Apached），但是仍然有以下问题   扫描时是线性扫描，即采用轮询的方法，效率较低 需要把 FD 集合从用户态拷贝到内核态，在 FD 很多时会开销很大    [关于 select 中 fd 限制问题] → define __FD_SETSIZE 1024 [为什么select打开的FD数量有限制，而poll、epoll等打开的FD数量没有限制]   poll（O(n)）  基于链表来存储，没有最大连接数的限制 select 和 poll 都需要在返回后，通过遍历文件描述符来获取已经就绪的 socket，随着监视的描述符数量的增长，其效率也会线性下降 需要将用户传入的数组拷贝到内核空间，然后查询每个fd对应的设备状态，不管这样的复制是不是有意义  epoll（O(1)）  在Linux 内核 2.</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://hello-world-example.github.io/Java-IO/docs/Network-IO-Model/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://hello-world-example.github.io/Java-IO/docs/Network-IO-Model/</guid>
+      <description>5 种 IO 模型 IO 执行的两个阶段 操作系统为了安全性等的考虑，进程是无法直接操作 I/O 设备的，其必须通过系统调用请求内核来协助完成 I/O 动作。
+ 等待数据准备好到达内核 Buffer 从内核向进程复制数据  |——————————————| &amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt; |--------------| &amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt; |--------------| | Process | | Kernel | | I/O Device | |--------------| &amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; |--------------| &amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; |--------------| (内核 Buffer 到进程空间) (I/O 设备到内核 Buffer) I/O 设备数据到 内核， 内核 到 进程用户空间，这两段时间内等待方式的不同，I/O动作可以分为五种模式。
+1. (同步)阻塞I/O (Blocking I/O)  在 IO 执行的两个阶段中，进程都处于 blocked(阻塞) 状态，在等待数据返回的过程中不能做其他的工作，只能阻塞的等在那里 优点：简单，实时性高，响应及时无延时 缺点：需要阻塞等待，性能差  2. (同步)非阻塞I/O (Non-Blocking I/O)  与阻塞式 I/O 不同的是，非阻塞系统调用调用之后，进程并没有被阻塞，内核马上返回给进程一个状态 采用轮询的方式检查内核数据，直到数据准备好，再拷贝数据到进程，进行数据处理 优点：能够在等待任务完成的时间里干其他活 缺点：任务完成的响应延迟增大，导致整体数据吞吐量的降低  3.</description>
     </item>
     
     <item>
@@ -29,37 +49,17 @@
 核心概念   position：表示当前位置的指针
  初始值为 0，最大可为 Buffer 的大小 写数据时，每次写，position 会向后移 从写模式 切换到 读模式时，position 会被重置为 0，每次读，position 会向后移    limit
  初始模式下 limit = capacity 写模式下 limit = capacity 切换读模式时，limit = position，position 重置为 0，limit 表示可以读数据的结束位置    capacity：Buffer 的固定大小值
-  常用方法  flip() 读写模式切换，limit = position，position 重置为 0 clear() 清空整个 Buffer，position=0 置为0、limit = capacity 为可写入的数据大小 compact() 只会清除已经读过的数据。任何未读的数据都被移到缓冲区的起始处，新写入的数据将放到缓冲区未读数据的后面。 mark() 标记一个 position 的位置，通过 reset() 恢复 position 位置 rewind() position 重置为 0，与flip() 的区别是 limit 不变，只重置 position，这样可以重新读 slice() 创建 [position,limit) 之间的子 Buffer，父子共享数据  </description>
+  0 &amp;lt;= position &amp;lt;= limit &amp;lt;= capacity
+  常用方法   flip() 写模式切换到读模式，limit = position，position 重置为 0</description>
     </item>
     
     <item>
       <title></title>
-      <link>https://hello-world-example.github.io/Java-IO/docs/NIO/channel/FileChannel/</link>
+      <link>https://hello-world-example.github.io/Java-IO/docs/NIO/Channel/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://hello-world-example.github.io/Java-IO/docs/NIO/channel/FileChannel/</guid>
-      <description>FileChannel // TODO 获取 FIle Channel 有几种方式
-参考资料  Java NIO系列教程（七） FileChannel  </description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>https://hello-world-example.github.io/Java-IO/docs/NIO/channel/ServerSocketChannel/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://hello-world-example.github.io/Java-IO/docs/NIO/channel/ServerSocketChannel/</guid>
-      <description>ServerSocketChannel ServerSocketChannel可以设置成非阻塞模式。在非阻塞模式下，accept() 方法会立刻返回，如果还没有新进来的连接,返回的将是null。 因此，需要检查返回的SocketChannel是否是null.如：</description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>https://hello-world-example.github.io/Java-IO/docs/NIO/channel/StandardSocketOptions/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://hello-world-example.github.io/Java-IO/docs/NIO/channel/StandardSocketOptions/</guid>
-      <description>StandardSocketOptions TODO
-https://blog.csdn.net/zero__007/article/details/51723434
-   枚举值 说明     IP_MULTICAST_IF This option is used to specify the network interface (NetworkInterface) used for multicast datagrams sent by the datagram-oriented socket; if it is null, then the OS will choose the outgoing interface (if one is available). By default, it is null, but the option’s value can be set after the socket is bound. When we talk about sending datagrams, you will see how to find out what multicast interfaces are available on your machine.</description>
+      <guid>https://hello-world-example.github.io/Java-IO/docs/NIO/Channel/</guid>
+      <description>Channel  标准的 IO 基于 字节流 和 字符流 进行操作，而 NIO 是基于 通道（Channel）和 缓冲区（Buffer） 进行操作  FileChannel FileLock   lock() 阻塞，锁定范围可以随着文件的增大而增加，默认为独占锁； tryLock() 非阻塞，当未获得锁时，返回 null      方法 说明     lock() 整个文件的独占锁定   lock(long position,long size,boolean shared) 文件指定区域上的锁定，共享锁   tryLock() throws IOException 试图获取 整个文件的独占锁定   tryLock(long position,long size,boolean shared) throws IOException 试图获取 文件指定区域上的锁定，共享锁   release() 释放锁   close() =&amp;gt; try (final FileLock lock = fileChannel.</description>
     </item>
     
     <item>
@@ -70,7 +70,17 @@ https://blog.csdn.net/zero__007/article/details/51723434
       <guid>https://hello-world-example.github.io/Java-IO/docs/NIO/Selector/</guid>
       <description>Selector  Selector 能够检测一个或多个 Channel，知晓通道是否为事件做好准备 这样一个单独的线程可以管理多个Channel，从而管理多个网络连接 与 Selector 一起使用时，Channel 必须处于非阻塞模式下 这意味着不能将 FileChannel 与 Selector 一起使用，因为 FileChannel 不能切换到非阻塞模式，而套接字通道都可以  核心概念 SelectionKey SelectionKey 中四种事件常量，表示了在通过 Selector 监听 Channel 时，对什么事件感兴趣。通道触发了一个事件意思是该事件已经就绪。
  OP_CONNECT ： 某个 Channel 成功连接到另一个服务器称为**“连接就绪”** OP_ACCEPT ： ServerSocketChannel 准备好接收新进入的连接称为**“接收就绪”** OP_READ ： 有数据可读的通道是**“读就绪”** OP_WRITE ： 等待写数据的通道是**“写就绪”**  如果你对不止一种事件感兴趣，那么可以用 | 操作符将常量连接起来，如下：
-int interestSet = SelectionKey.OP_READ | SelectionKey.OP_WRITE; 示例 Read More  Java NIO 之 Selector 练习  </description>
+int interestSet = SelectionKey.OP_READ | SelectionKey.OP_WRITE; Read More  NIO Example  Java NIO 之 Selector 练习  </description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://hello-world-example.github.io/Java-IO/docs/Zero-Copy/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://hello-world-example.github.io/Java-IO/docs/Zero-Copy/</guid>
+      <description>零拷贝技术  本文来自：原来 8 张图，就可以搞懂「零拷贝」了_小林coding
+ DMA  DMA：Direct Memory Access，直接内存访问 DMA 主要功能是传输数据，但是不需要占用 CPU，即在传输数据时，CPU 可以做别的事 如今由于 I/O 设备越来越多，数据传输的需求也不尽相同，所以每个 I/O 设备里面都有自己的 DMA 控制器  传统文件传输方式  图中 1 份数据的 Copy 过程，产生了 4 次上下切换 和 4 次数据 Copy 零拷贝技术 的目的是为 减少「用户态与内核态的上下文切换」和「内存拷贝」的次数  优化传输的思路 减少上下文切换  读取磁盘数据的时候，之所以要发生上下文切换，这是因为用户空间没有权限操作磁盘或网卡 所以，操作设备的过程都需要交由操作系统内核来完成，所以一般要通过使用操作系统提供的系统调用函数 一次系统调用必然会发生 2 次上下文切换  调用的时候，首先从用户态切换到内核态 当内核执行完任务后，再切换回用户态交由进程代码执行   要想减少上下文切换到次数，就要 减少系统调用的次数  减少拷贝次数  传统的文件传输方式会历经 4 次数据拷贝 从内核的读缓冲区拷贝到用户的缓冲区里，再从用户的缓冲区里拷贝到 socket 的缓冲区里，这个过程是没有必要的 文件传输的应用场景中，在用户空间我们并不会对数据「再加工」，所以可以不用搬运到用户空间，因此用户的缓冲区是没有必要存在的  mmap + write  使用 mmap() 来代替 read()， 可以减少一次数据拷贝的过程，减少了一次 数据 Copy  NIO 示例 final Path filePath = FileChannelTool.</description>
     </item>
     
   </channel>

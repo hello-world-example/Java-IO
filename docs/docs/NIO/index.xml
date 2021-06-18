@@ -20,37 +20,17 @@
 核心概念   position：表示当前位置的指针
  初始值为 0，最大可为 Buffer 的大小 写数据时，每次写，position 会向后移 从写模式 切换到 读模式时，position 会被重置为 0，每次读，position 会向后移    limit
  初始模式下 limit = capacity 写模式下 limit = capacity 切换读模式时，limit = position，position 重置为 0，limit 表示可以读数据的结束位置    capacity：Buffer 的固定大小值
-  常用方法  flip() 读写模式切换，limit = position，position 重置为 0 clear() 清空整个 Buffer，position=0 置为0、limit = capacity 为可写入的数据大小 compact() 只会清除已经读过的数据。任何未读的数据都被移到缓冲区的起始处，新写入的数据将放到缓冲区未读数据的后面。 mark() 标记一个 position 的位置，通过 reset() 恢复 position 位置 rewind() position 重置为 0，与flip() 的区别是 limit 不变，只重置 position，这样可以重新读 slice() 创建 [position,limit) 之间的子 Buffer，父子共享数据  </description>
+  0 &amp;lt;= position &amp;lt;= limit &amp;lt;= capacity
+  常用方法   flip() 写模式切换到读模式，limit = position，position 重置为 0</description>
     </item>
     
     <item>
       <title></title>
-      <link>https://hello-world-example.github.io/Java-IO/docs/NIO/channel/FileChannel/</link>
+      <link>https://hello-world-example.github.io/Java-IO/docs/NIO/Channel/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://hello-world-example.github.io/Java-IO/docs/NIO/channel/FileChannel/</guid>
-      <description>FileChannel // TODO 获取 FIle Channel 有几种方式
-参考资料  Java NIO系列教程（七） FileChannel  </description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>https://hello-world-example.github.io/Java-IO/docs/NIO/channel/ServerSocketChannel/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://hello-world-example.github.io/Java-IO/docs/NIO/channel/ServerSocketChannel/</guid>
-      <description>ServerSocketChannel ServerSocketChannel可以设置成非阻塞模式。在非阻塞模式下，accept() 方法会立刻返回，如果还没有新进来的连接,返回的将是null。 因此，需要检查返回的SocketChannel是否是null.如：</description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>https://hello-world-example.github.io/Java-IO/docs/NIO/channel/StandardSocketOptions/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://hello-world-example.github.io/Java-IO/docs/NIO/channel/StandardSocketOptions/</guid>
-      <description>StandardSocketOptions TODO
-https://blog.csdn.net/zero__007/article/details/51723434
-   枚举值 说明     IP_MULTICAST_IF This option is used to specify the network interface (NetworkInterface) used for multicast datagrams sent by the datagram-oriented socket; if it is null, then the OS will choose the outgoing interface (if one is available). By default, it is null, but the option’s value can be set after the socket is bound. When we talk about sending datagrams, you will see how to find out what multicast interfaces are available on your machine.</description>
+      <guid>https://hello-world-example.github.io/Java-IO/docs/NIO/Channel/</guid>
+      <description>Channel  标准的 IO 基于 字节流 和 字符流 进行操作，而 NIO 是基于 通道（Channel）和 缓冲区（Buffer） 进行操作  FileChannel FileLock   lock() 阻塞，锁定范围可以随着文件的增大而增加，默认为独占锁； tryLock() 非阻塞，当未获得锁时，返回 null      方法 说明     lock() 整个文件的独占锁定   lock(long position,long size,boolean shared) 文件指定区域上的锁定，共享锁   tryLock() throws IOException 试图获取 整个文件的独占锁定   tryLock(long position,long size,boolean shared) throws IOException 试图获取 文件指定区域上的锁定，共享锁   release() 释放锁   close() =&amp;gt; try (final FileLock lock = fileChannel.</description>
     </item>
     
     <item>
@@ -61,7 +41,7 @@ https://blog.csdn.net/zero__007/article/details/51723434
       <guid>https://hello-world-example.github.io/Java-IO/docs/NIO/Selector/</guid>
       <description>Selector  Selector 能够检测一个或多个 Channel，知晓通道是否为事件做好准备 这样一个单独的线程可以管理多个Channel，从而管理多个网络连接 与 Selector 一起使用时，Channel 必须处于非阻塞模式下 这意味着不能将 FileChannel 与 Selector 一起使用，因为 FileChannel 不能切换到非阻塞模式，而套接字通道都可以  核心概念 SelectionKey SelectionKey 中四种事件常量，表示了在通过 Selector 监听 Channel 时，对什么事件感兴趣。通道触发了一个事件意思是该事件已经就绪。
  OP_CONNECT ： 某个 Channel 成功连接到另一个服务器称为**“连接就绪”** OP_ACCEPT ： ServerSocketChannel 准备好接收新进入的连接称为**“接收就绪”** OP_READ ： 有数据可读的通道是**“读就绪”** OP_WRITE ： 等待写数据的通道是**“写就绪”**  如果你对不止一种事件感兴趣，那么可以用 | 操作符将常量连接起来，如下：
-int interestSet = SelectionKey.OP_READ | SelectionKey.OP_WRITE; 示例 Read More  Java NIO 之 Selector 练习  </description>
+int interestSet = SelectionKey.OP_READ | SelectionKey.OP_WRITE; Read More  NIO Example  Java NIO 之 Selector 练习  </description>
     </item>
     
   </channel>

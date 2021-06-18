@@ -8,6 +8,10 @@ Buffer 用于和 NIO Channel 进行交互，数据是从通道读入缓冲区，
 
 
 
+![Buffer-数据结构.png](-images/Buffer-数据结构.png)
+
+
+
 ## 核心概念
 
 
@@ -31,14 +35,34 @@ Buffer 用于和 NIO Channel 进行交互，数据是从通道读入缓冲区，
 
 
 
+- `0 <= position <= limit <= capacity`
+
+
+
 ## 常用方法
 
-- `flip()` 读写模式切换，limit = position，position 重置为 0
+- `flip()` 写模式切换到读模式，limit = position，position 重置为 0
+- `rewind()` position 重置为 0，与`flip()` 的区别是 limit 不变，只重置 position，这样可以重新读
+
+
+
+- `mark()` 标记 position 的位置
+- `reset()` 恢复 position 位置
+
+
+
 - `clear()` 清空整个 Buffer，position=0 置为0、limit = capacity 为可写入的数据大小
 - `compact()` 只会清除已经读过的数据。任何未读的数据都被移到缓冲区的起始处，新写入的数据将放到缓冲区未读数据的后面。
-- `mark()` 标记一个 position 的位置，通过 `reset()` 恢复 position 位置
-- `rewind()` position 重置为 0，与`flip()` 的区别是 limit 不变，只重置 position，这样可以重新读
+
+
+
 - `slice()` 创建 `[position,limit)` 之间的子 Buffer，父子共享数据
 
 
+
+## Read More
+
+- [NIO Example](https://github.com/hello-world-example/Java-IO/tree/master/demo-java-nio/src/main/java/xyz/kail/demo/java/io)
+- 
+- [NIO相关基础篇 一](https://mp.weixin.qq.com/s/jeuISFEh49aUheFsX_aHMg)
 

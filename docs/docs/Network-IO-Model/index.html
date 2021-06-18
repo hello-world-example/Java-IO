@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="5 种 IO 模型 IO 执行的两个阶段 操作系统为了安全性等的考虑，进程是无法直接操作 I/O 设备的，其必须通过系统调用请求内核来协助完成 I/O 动作。
+ 等待数据准备好到达内核 Buffer 从内核向进程复制数据  |——————————————| &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt; |--------------| &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt; |--------------| | Process | | Kernel | | I/O Device | |--------------| &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt; |--------------| &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt; |--------------| (内核 Buffer 到进程空间) (I/O 设备到内核 Buffer) I/O 设备数据到 内核， 内核 到 进程用户空间，这两段时间内等待方式的不同，I/O动作可以分为五种模式。
+1. (同步)阻塞I/O (Blocking I/O)  在 IO 执行的两个阶段中，进程都处于 blocked(阻塞) 状态，在等待数据返回的过程中不能做其他的工作，只能阻塞的等在那里 优点：简单，实时性高，响应及时无延时 缺点：需要阻塞等待，性能差  2. (同步)非阻塞I/O (Non-Blocking I/O)  与阻塞式 I/O 不同的是，非阻塞系统调用调用之后，进程并没有被阻塞，内核马上返回给进程一个状态 采用轮询的方式检查内核数据，直到数据准备好，再拷贝数据到进程，进行数据处理 优点：能够在等待任务完成的时间里干其他活 缺点：任务完成的响应延迟增大，导致整体数据吞吐量的降低  3."><meta property="og:title" content="" />
+<meta property="og:description" content="5 种 IO 模型 IO 执行的两个阶段 操作系统为了安全性等的考虑，进程是无法直接操作 I/O 设备的，其必须通过系统调用请求内核来协助完成 I/O 动作。
+ 等待数据准备好到达内核 Buffer 从内核向进程复制数据  |——————————————| &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt; |--------------| &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt; |--------------| | Process | | Kernel | | I/O Device | |--------------| &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt; |--------------| &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt; |--------------| (内核 Buffer 到进程空间) (I/O 设备到内核 Buffer) I/O 设备数据到 内核， 内核 到 进程用户空间，这两段时间内等待方式的不同，I/O动作可以分为五种模式。
+1. (同步)阻塞I/O (Blocking I/O)  在 IO 执行的两个阶段中，进程都处于 blocked(阻塞) 状态，在等待数据返回的过程中不能做其他的工作，只能阻塞的等在那里 优点：简单，实时性高，响应及时无延时 缺点：需要阻塞等待，性能差  2. (同步)非阻塞I/O (Non-Blocking I/O)  与阻塞式 I/O 不同的是，非阻塞系统调用调用之后，进程并没有被阻塞，内核马上返回给进程一个状态 采用轮询的方式检查内核数据，直到数据准备好，再拷贝数据到进程，进行数据处理 优点：能够在等待任务完成的时间里干其他活 缺点：任务完成的响应延迟增大，导致整体数据吞吐量的降低  3." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hello-world-example.github.io/Java-IO/docs/Network-IO-Model/" />
+
+<title>Network I O Model | Java-IO</title>
+<link rel="icon" href="/Java-IO/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/Java-IO/book.min.00b8e784201abfe629a6e0741e94bf44575af8612aec171d94e4ecbd3692cf5c.css" integrity="sha256-ALjnhCAav&#43;YppuB0HpS/RFda&#43;GEq7BcdlOTsvTaSz1w=">
+
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/Java-IO"><span>Java-IO</span>
+  </a>
+</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+  <ul>
+<li><a href="/Java-IO/docs/Network-IO-Model/"class=active>5 种 IO 模型</a></li>
+<li><a href="/Java-IO/docs/IO-Multiplexing-Type/">IO 多路复用</a></li>
+<li><a href="/Java-IO/docs/Zero-Copy/">零拷贝技术</a></li>
+<li><a href="/Java-IO/docs/NIO/"><strong>NIO</strong></a>
+<ul>
+<li><a href="/Java-IO/docs/NIO/Buffer/">Buffer</a></li>
+<li><a href="/Java-IO/docs/NIO/Channel/">Channel</a></li>
+<li><a href="/Java-IO/docs/NIO/Selector/">Selector</a></li>
+</ul>
+</li>
+<li><a href="/Network"><strong>Network</strong>🔗 </a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/Java-IO/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>Network I O Model</strong>
+
+  <label for="toc-control">
+    <img src="/Java-IO/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#io-执行的两个阶段">IO 执行的两个阶段</a></li>
+    <li><a href="#1-同步阻塞io-blocking-io">1. (同步)阻塞I/O (Blocking I/O)</a></li>
+    <li><a href="#2-同步非阻塞io-non-blocking-io">2. (同步)非阻塞I/O (Non-Blocking I/O)</a></li>
+    <li><a href="#3-io-复用io-multiplexing-selectpollepoll">3. I/O 复用（I/O Multiplexing: select、poll、epoll)</a></li>
+    <li><a href="#4-信号驱动的io-signal-driven-io">4. 信号驱动的I/O (Signal Driven I/O)</a></li>
+    <li><a href="#5-异步io-asynchrnous-io">5. 异步I/O (Asynchrnous I/O)</a></li>
+    <li><a href="#对比">对比</a></li>
+    <li><a href="#read-more">Read More</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h1 id="5-种-io-模型">5 种 IO 模型</h1>
+<h2 id="io-执行的两个阶段">IO 执行的两个阶段</h2>
+<p>操作系统为了安全性等的考虑，<strong>进程是无法直接操作 I/O 设备的</strong>，其必须<strong>通过系统调用</strong>请求<strong>内核来协助完成 I/O 动作</strong>。</p>
+<ul>
+<li>等待数据准备好到达内核 Buffer</li>
+<li>从内核向进程复制数据</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-txt" data-lang="txt">|——————————————|  &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;  |--------------| &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;  |--------------|
+|    Process   |             |    Kernel    |            |  I/O Device  |
+|--------------|  &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;  |--------------| &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;  |--------------|
+            (内核 Buffer 到进程空间)         (I/O 设备到内核 Buffer)
+</code></pre></div><p>I/O 设备数据到 内核， 内核 到 进程用户空间，这两段时间内<strong>等待方式的不同</strong>，I/O动作可以分为<strong>五种模式</strong>。</p>
+<h2 id="1-同步阻塞io-blocking-io">1. (同步)阻塞I/O (Blocking I/O)</h2>
+<p><img src="-images/Network-IO-Model-Blocking_IO.png" alt="image-20210617212843401" /></p>
+<ul>
+<li><strong>在 IO 执行的两个阶段中，进程都处于 blocked(阻塞) 状态</strong>，在等待数据返回的过程中不能做其他的工作，只能阻塞的等在那里</li>
+<li>优点：简单，实时性高，响应及时无延时</li>
+<li>缺点：需要阻塞等待，性能差</li>
+</ul>
+<h2 id="2-同步非阻塞io-non-blocking-io">2. (同步)非阻塞I/O (Non-Blocking I/O)</h2>
+<p><img src="-images/Network-IO-Model-Non-Blocking-IO.png" alt="image-20210617212900820" /></p>
+<ul>
+<li>与阻塞式 I/O 不同的是，非阻塞系统调用调用之后，<strong>进程并没有被阻塞，内核马上返回给进程一个状态</strong></li>
+<li>采用<strong>轮询的方式检查内核数据，直到数据准备好</strong>，再拷贝数据到进程，进行数据处理</li>
+<li>优点：<strong>能够在等待任务完成的时间里干其他活</strong></li>
+<li>缺点：任务完成的响应<strong>延迟增大</strong>，导致整体<strong>数据吞吐量的降低</strong></li>
+</ul>
+<h2 id="3-io-复用io-multiplexing-selectpollepoll">3. I/O 复用（I/O Multiplexing: select、poll、epoll)</h2>
+<p><img src="-images/Network-IO-Model-IO-Multiplexing.png" alt="image-20210617212913243" /></p>
+<ul>
+<li>单个进程就可以同时处理多个网络连接的 IO</li>
+<li>基本原理就是<strong>不再由应用程序自己监视连接</strong>，取而代之由<strong>内核替应用程序监视文件描述符</strong>，当任何一个 Socket 中的数据准备好了，用户进程再调用 Read 操作，将数据从内核拷贝到用户进程</li>
+<li>IO 复用的<strong>优势并不是对于单个连接能处理得更快，而是单个进程就可以同时处理多个网络连接的 IO</strong></li>
+<li>如果处理的<strong>连接数不是很高的话</strong>，使用 IO复用的服务器 <strong>并不一定比使用 多线程+非阻塞 阻塞 IO的性能更好</strong>，可能延迟还更大</li>
+<li><strong>优势：</strong> 与传统的多线程/多进程模型比，<strong>I/O多路复用的最大优势是系统开销小</strong>，系统不需要创建新的额外进程或者线程，也不需要维护这些进程和线程的运行，<strong>降底了系统的维护工作量，节省了系统资源</strong></li>
+</ul>
+<h2 id="4-信号驱动的io-signal-driven-io">4. 信号驱动的I/O (Signal Driven I/O)</h2>
+<p><img src="-images/Network-IO-Model-Signal-Driven-IO.png" alt="image-20210617212925499" /></p>
+<ul>
+<li>允许注册一个信号处理函数，<strong>进程继续运行并不阻塞</strong></li>
+<li>当数据准备好时，进程会收到一个 SIGIO 信号，可以在信号处理函数中调用 I/O 操作函数处理数据</li>
+<li>与 I/O 复用对
+<ul>
+<li>区别：数据就绪<strong>信号的接收是异步回调</strong>，而 I/O 复用 的 <strong>select 调用是同步等待</strong></li>
+<li>相同：<strong>内核到用户空间的数据拷贝 都是同步的</strong></li>
+</ul>
+</li>
+</ul>
+<h2 id="5-异步io-asynchrnous-io">5. 异步I/O (Asynchrnous I/O)</h2>
+<p><img src="-images/Network-IO-Model-Asynchrnous-IO.png" alt="Network-IO-Model-Asynchrnous-IO.png" /></p>
+<ul>
+<li>上述四种 IO 模型都是同步的，因为<strong>数据从内核到进程空间拷贝都是同步调用</strong></li>
+<li><strong>等到数据准备好了，内核直接复制数据到进程空间</strong>，然后从内核向进程发送通知，此时数据已经在用户空间了</li>
+</ul>
+<h2 id="对比">对比</h2>
+<p><img src="-images/Network-IO-Model-compare.png" alt="Network-IO-Model-compare.png" /></p>
+<p><img src="-images/Network-IO-Model-compare2.png" alt="image-20210617223011227" /></p>
+<h2 id="read-more">Read More</h2>
+<ul>
+<li><a href="https://blog.csdn.net/z_ryan/article/details/80873449">[原文] Linux 五种 IO 模型</a></li>
+<li><a href="https://mp.weixin.qq.com/s/5SKgdkC0kaHN495psLd3Tg">NIO相关基础篇三</a></li>
+</ul>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hello-world-example/Java-IO/edit/master/HuGo/content/docs/Network-IO-Model.md" target="_blank" rel="noopener">
+      <img src="/Java-IO/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        <script>
+    var images = document.getElementsByTagName("img")
+    console.info(images.length)
+    for (var i = 0; i < images.length; i++) {
+        var image = images[i]
+        var src = image.getAttribute("src");
+        if (src.startsWith("-images")) {
+            image.setAttribute("src", "../" + src);
+        }
+        image.onclick = function () {
+            window.open(this.getAttribute("src"))
+        }
+    }
+</script>
+
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#io-执行的两个阶段">IO 执行的两个阶段</a></li>
+    <li><a href="#1-同步阻塞io-blocking-io">1. (同步)阻塞I/O (Blocking I/O)</a></li>
+    <li><a href="#2-同步非阻塞io-non-blocking-io">2. (同步)非阻塞I/O (Non-Blocking I/O)</a></li>
+    <li><a href="#3-io-复用io-multiplexing-selectpollepoll">3. I/O 复用（I/O Multiplexing: select、poll、epoll)</a></li>
+    <li><a href="#4-信号驱动的io-signal-driven-io">4. 信号驱动的I/O (Signal Driven I/O)</a></li>
+    <li><a href="#5-异步io-asynchrnous-io">5. 异步I/O (Asynchrnous I/O)</a></li>
+    <li><a href="#对比">对比</a></li>
+    <li><a href="#read-more">Read More</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

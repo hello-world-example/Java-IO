@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Channel  标准的 IO 基于 字节流 和 字符流 进行操作，而 NIO 是基于 通道（Channel）和 缓冲区（Buffer） 进行操作  FileChannel FileLock   lock() 阻塞，锁定范围可以随着文件的增大而增加，默认为独占锁； tryLock() 非阻塞，当未获得锁时，返回 null      方法 说明     lock() 整个文件的独占锁定   lock(long position,long size,boolean shared) 文件指定区域上的锁定，共享锁   tryLock() throws IOException 试图获取 整个文件的独占锁定   tryLock(long position,long size,boolean shared) throws IOException 试图获取 文件指定区域上的锁定，共享锁   release() 释放锁   close() =&gt; try (final FileLock lock = fileChannel."><meta property="og:title" content="" />
+<meta property="og:description" content="Channel  标准的 IO 基于 字节流 和 字符流 进行操作，而 NIO 是基于 通道（Channel）和 缓冲区（Buffer） 进行操作  FileChannel FileLock   lock() 阻塞，锁定范围可以随着文件的增大而增加，默认为独占锁； tryLock() 非阻塞，当未获得锁时，返回 null      方法 说明     lock() 整个文件的独占锁定   lock(long position,long size,boolean shared) 文件指定区域上的锁定，共享锁   tryLock() throws IOException 试图获取 整个文件的独占锁定   tryLock(long position,long size,boolean shared) throws IOException 试图获取 文件指定区域上的锁定，共享锁   release() 释放锁   close() =&gt; try (final FileLock lock = fileChannel." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hello-world-example.github.io/Java-IO/docs/NIO/Channel/" />
+
+<title>Channel | Java-IO</title>
+<link rel="icon" href="/Java-IO/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/Java-IO/book.min.00b8e784201abfe629a6e0741e94bf44575af8612aec171d94e4ecbd3692cf5c.css" integrity="sha256-ALjnhCAav&#43;YppuB0HpS/RFda&#43;GEq7BcdlOTsvTaSz1w=">
+
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/Java-IO"><span>Java-IO</span>
+  </a>
+</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+  <ul>
+<li><a href="/Java-IO/docs/Network-IO-Model/">5 种 IO 模型</a></li>
+<li><a href="/Java-IO/docs/IO-Multiplexing-Type/">IO 多路复用</a></li>
+<li><a href="/Java-IO/docs/Zero-Copy/">零拷贝技术</a></li>
+<li><a href="/Java-IO/docs/NIO/"><strong>NIO</strong></a>
+<ul>
+<li><a href="/Java-IO/docs/NIO/Buffer/">Buffer</a></li>
+<li><a href="/Java-IO/docs/NIO/Channel/"class=active>Channel</a></li>
+<li><a href="/Java-IO/docs/NIO/Selector/">Selector</a></li>
+</ul>
+</li>
+<li><a href="/Network"><strong>Network</strong>🔗 </a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/Java-IO/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>Channel</strong>
+
+  <label for="toc-control">
+    <img src="/Java-IO/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#filechannel">FileChannel</a>
+      <ul>
+        <li><a href="#filelock">FileLock</a></li>
+      </ul>
+    </li>
+    <li><a href="#read-more">Read More</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h1 id="channel">Channel</h1>
+<ul>
+<li>标准的 IO 基于 <strong>字节流 和 字符流</strong> 进行操作，而 NIO 是基于 <strong>通道（Channel）和 缓冲区（Buffer）</strong> 进行操作</li>
+</ul>
+<p><img src="-images/Channel.png" alt="Channel.png" /></p>
+<h2 id="filechannel">FileChannel</h2>
+<h3 id="filelock">FileLock</h3>
+<blockquote>
+<ul>
+<li><code>lock()</code> 阻塞，锁定范围可以随着文件的增大而增加，默认为独占锁；</li>
+<li><code>tryLock()</code> 非阻塞，当未获得锁时，返回 <code>null</code></li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th align="left">方法</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>lock()</code></td>
+<td align="left">整个文件的独占锁定</td>
+</tr>
+<tr>
+<td align="left"><code>lock(long position,long size,boolean shared)</code></td>
+<td align="left">文件指定区域上的锁定，共享锁</td>
+</tr>
+<tr>
+<td align="left"><code>tryLock() throws IOException</code></td>
+<td align="left">试图获取 整个文件的独占锁定</td>
+</tr>
+<tr>
+<td align="left"><code>tryLock(long position,long size,boolean shared) throws IOException</code></td>
+<td align="left">试图获取 文件指定区域上的锁定，共享锁</td>
+</tr>
+<tr>
+<td align="left"><code>release()</code></td>
+<td align="left">释放锁</td>
+</tr>
+<tr>
+<td align="left"><code>close()</code> =&gt;  <code>try (final FileLock lock = fileChannel.lock()) { ... }</code></td>
+<td align="left">释放锁</td>
+</tr>
+</tbody>
+</table>
+<h2 id="read-more">Read More</h2>
+<ul>
+<li>
+<p><a href="https://github.com/hello-world-example/Java-IO/tree/master/demo-java-nio/src/main/java/xyz/kail/demo/java/io">NIO Example</a></p>
+</li>
+<li>
+<p><a href="https://mp.weixin.qq.com/s/jeuISFEh49aUheFsX_aHMg">NIO相关基础篇 一</a></p>
+</li>
+<li>
+<p><a href="https://mp.weixin.qq.com/s/KN7ANdJBLidlKBs6fGCutQ">NIO相关基础篇二</a></p>
+</li>
+</ul>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hello-world-example/Java-IO/edit/master/HuGo/content/docs/NIO/Channel.md" target="_blank" rel="noopener">
+      <img src="/Java-IO/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        <script>
+    var images = document.getElementsByTagName("img")
+    console.info(images.length)
+    for (var i = 0; i < images.length; i++) {
+        var image = images[i]
+        var src = image.getAttribute("src");
+        if (src.startsWith("-images")) {
+            image.setAttribute("src", "../" + src);
+        }
+        image.onclick = function () {
+            window.open(this.getAttribute("src"))
+        }
+    }
+</script>
+
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#filechannel">FileChannel</a>
+      <ul>
+        <li><a href="#filelock">FileLock</a></li>
+      </ul>
+    </li>
+    <li><a href="#read-more">Read More</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

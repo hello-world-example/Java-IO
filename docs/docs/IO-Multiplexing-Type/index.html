@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="IO 多路复用技术  select、 poll、epoll 都是 阻塞调用 多路：多个 Socket 套接字 复用：同一个进程、线程  select（O(n)） // 当 select 函数返回后，可以通过遍历 fdset，来找到就绪的描述符 int select( int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout // 等待时间，如果立即返回设为 null )  select 最大的缺陷就是打开的 FD 是有一定限制的  可以通过多进程的方式突破限制（Apached），但是仍然有以下问题   扫描时是线性扫描，即采用轮询的方法，效率较低 需要把 FD 集合从用户态拷贝到内核态，在 FD 很多时会开销很大    [关于 select 中 fd 限制问题] → define __FD_SETSIZE 1024 [为什么select打开的FD数量有限制，而poll、epoll等打开的FD数量没有限制]   poll（O(n)）  基于链表来存储，没有最大连接数的限制 select 和 poll 都需要在返回后，通过遍历文件描述符来获取已经就绪的 socket，随着监视的描述符数量的增长，其效率也会线性下降 需要将用户传入的数组拷贝到内核空间，然后查询每个fd对应的设备状态，不管这样的复制是不是有意义  epoll（O(1)）  在Linux 内核 2."><meta property="og:title" content="" />
+<meta property="og:description" content="IO 多路复用技术  select、 poll、epoll 都是 阻塞调用 多路：多个 Socket 套接字 复用：同一个进程、线程  select（O(n)） // 当 select 函数返回后，可以通过遍历 fdset，来找到就绪的描述符 int select( int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout // 等待时间，如果立即返回设为 null )  select 最大的缺陷就是打开的 FD 是有一定限制的  可以通过多进程的方式突破限制（Apached），但是仍然有以下问题   扫描时是线性扫描，即采用轮询的方法，效率较低 需要把 FD 集合从用户态拷贝到内核态，在 FD 很多时会开销很大    [关于 select 中 fd 限制问题] → define __FD_SETSIZE 1024 [为什么select打开的FD数量有限制，而poll、epoll等打开的FD数量没有限制]   poll（O(n)）  基于链表来存储，没有最大连接数的限制 select 和 poll 都需要在返回后，通过遍历文件描述符来获取已经就绪的 socket，随着监视的描述符数量的增长，其效率也会线性下降 需要将用户传入的数组拷贝到内核空间，然后查询每个fd对应的设备状态，不管这样的复制是不是有意义  epoll（O(1)）  在Linux 内核 2." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hello-world-example.github.io/Java-IO/docs/IO-Multiplexing-Type/" />
+
+<title>I O Multiplexing Type | Java-IO</title>
+<link rel="icon" href="/Java-IO/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/Java-IO/book.min.00b8e784201abfe629a6e0741e94bf44575af8612aec171d94e4ecbd3692cf5c.css" integrity="sha256-ALjnhCAav&#43;YppuB0HpS/RFda&#43;GEq7BcdlOTsvTaSz1w=">
+
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/Java-IO"><span>Java-IO</span>
+  </a>
+</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+  <ul>
+<li><a href="/Java-IO/docs/Network-IO-Model/">5 种 IO 模型</a></li>
+<li><a href="/Java-IO/docs/IO-Multiplexing-Type/"class=active>IO 多路复用</a></li>
+<li><a href="/Java-IO/docs/Zero-Copy/">零拷贝技术</a></li>
+<li><a href="/Java-IO/docs/NIO/"><strong>NIO</strong></a>
+<ul>
+<li><a href="/Java-IO/docs/NIO/Buffer/">Buffer</a></li>
+<li><a href="/Java-IO/docs/NIO/Channel/">Channel</a></li>
+<li><a href="/Java-IO/docs/NIO/Selector/">Selector</a></li>
+</ul>
+</li>
+<li><a href="/Network"><strong>Network</strong>🔗 </a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/Java-IO/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>I O Multiplexing Type</strong>
+
+  <label for="toc-control">
+    <img src="/Java-IO/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#selectosubnsub">select（O<!-- raw HTML omitted -->(n)<!-- raw HTML omitted -->）</a></li>
+    <li><a href="#pollosubnsub">poll（O<!-- raw HTML omitted -->(n)<!-- raw HTML omitted -->）</a></li>
+    <li><a href="#epollosub1sub">epoll（O<!-- raw HTML omitted -->(1)<!-- raw HTML omitted -->）</a>
+      <ul>
+        <li><a href="#水平触发-ltlevel-triggered">水平触发 LT(Level Triggered)</a></li>
+        <li><a href="#边缘触发-et-edge-triggered">边缘触发 ET (Edge Triggered)</a></li>
+        <li><a href="#epoll-优点">epoll 优点</a></li>
+      </ul>
+    </li>
+    <li><a href="#kqueue">kqueue</a></li>
+    <li><a href="#read-more">Read More</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h1 id="io-多路复用技术">IO 多路复用技术</h1>
+<ul>
+<li><code>select</code>、 <code>poll</code>、<code>epoll</code> 都是 <strong>阻塞调用</strong></li>
+<li><strong>多路</strong>：多个 Socket 套接字</li>
+<li><strong>复用</strong>：同一个进程、线程</li>
+</ul>
+<h2 id="selectosubnsub">select（O<!-- raw HTML omitted -->(n)<!-- raw HTML omitted -->）</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// 当 select 函数返回后，可以通过遍历 fdset，来找到就绪的描述符
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> select(
+  <span style="color:#66d9ef">int</span> nfds, 
+  fd_set <span style="color:#f92672">*</span>readfds, 
+  fd_set <span style="color:#f92672">*</span>writefds, 
+  fd_set <span style="color:#f92672">*</span>exceptfds, 
+  <span style="color:#66d9ef">struct</span> timeval <span style="color:#f92672">*</span>timeout <span style="color:#75715e">// 等待时间，如果立即返回设为 null
+</span><span style="color:#75715e"></span>)
+</code></pre></div><ul>
+<li>select 最大的缺陷就是<strong>打开的 FD 是有一定限制的</strong>
+<ul>
+<li>可以通过多进程的方式突破限制（Apached），但是仍然有以下问题</li>
+</ul>
+</li>
+<li>扫描时是<strong>线性扫描，即采用轮询的方法，效率较低</strong></li>
+<li>需要把 FD 集合<strong>从用户态拷贝到内核态</strong>，在 FD 很多时会开销很大</li>
+</ul>
+<blockquote>
+<ul>
+<li>[<a href="https://www.cnblogs.com/yeta/p/3616728.html">关于 select 中 fd 限制问题</a>] → <code>define __FD_SETSIZE  1024</code></li>
+<li>[<a href="https://www.zhihu.com/question/37219281/answer/74003967">为什么select打开的FD数量有限制，而poll、epoll等打开的FD数量没有限制</a>]</li>
+</ul>
+</blockquote>
+<h2 id="pollosubnsub">poll（O<!-- raw HTML omitted -->(n)<!-- raw HTML omitted -->）</h2>
+<ul>
+<li><strong>基于链表来存储，没有最大连接数的限制</strong></li>
+<li><code>select</code> 和 <code>poll</code> 都需要在返回后，通过遍<strong>历文件描述符来获取已经就绪的 socket</strong>，随着监视的描述符数量的增长，其<strong>效率也会线性下降</strong></li>
+<li>需要将用户传入的<strong>数组拷贝到内核空间，然后查询每个fd对应的设备状态</strong>，不管这样的复制是不是有意义</li>
+</ul>
+<h2 id="epollosub1sub">epoll（O<!-- raw HTML omitted -->(1)<!-- raw HTML omitted -->）</h2>
+<ul>
+<li>在Linux 内核 2.6 中提出，是之前的 select 和 poll 的增强版本，<strong>能处理大批量句柄</strong></li>
+<li><strong>JDK1.5_update10 版本使用 epoll 替代了传统的 select/poll</strong>，极大的提升了NIO通信的性能</li>
+</ul>
+<h3 id="水平触发-ltlevel-triggered">水平触发 LT(Level Triggered)</h3>
+<ul>
+<li>默认工作方式</li>
+<li>支持 Block 和 No-Block Socket</li>
+<li>内核告诉你一个文件描述符是否就绪了，然后你可以对这个就绪的 fd 进行 IO 操作</li>
+<li><strong>如果你不作任何操作，内核还是会继续通知</strong></li>
+<li>这种模式编程出错误可能性要小一点，传统的 select/poll 都是这种模型的代表</li>
+</ul>
+<h3 id="边缘触发-et-edge-triggered">边缘触发 ET (Edge Triggered)</h3>
+<ul>
+<li>高速工作方式，<strong>只支持 No-Block Socket</strong></li>
+<li>在这种模式下，当描述符从未就绪变为就绪时，内核会进行通知</li>
+<li>但是然后它会假设你知道文件描述符已经就绪，<strong>不会再为那个文件描述符发送更多的就绪通知（only once）</strong>，直到你做了某些操作导致那个文件描述符不再为就绪状态了</li>
+</ul>
+<h3 id="epoll-优点">epoll 优点</h3>
+<ol>
+<li><strong>没有最大并发连接的限制</strong>，能打开的 FD 的上限远大于 1024</li>
+<li><strong>效率提升，不是轮询的方式</strong>，不会随着 FD 数目的增加效率下降，只有活跃可用的 FD 才会调用 <code>callback</code> 函数
+<ul>
+<li>即最大的优点就在于它只管 <strong>活跃</strong> 的连接，而跟连接总数无关，效率就会远远高于 <code>select</code> 和 <code>poll</code></li>
+</ul>
+</li>
+<li><strong>内存拷贝</strong>，利用 <code>mmap()</code> 文件映射内存加速与内核空间的消息传递，减少复制开销</li>
+</ol>
+<h2 id="kqueue">kqueue</h2>
+<ul>
+<li>也是 <strong>I/O 多路复用技术</strong> 的一种</li>
+<li><code>select</code>、 <code>poll</code>、 <code>epoll</code> 为 Linux 独占</li>
+<li><code>kqueue</code> 则在许多UNIX系统上存在，包括 MacOS</li>
+</ul>
+<h2 id="read-more">Read More</h2>
+<ul>
+<li>[<a href="https://juejin.cn/post/6892687008552976398">见识一下 linux 高性能网络 IO+Reactor 模型 </a>]</li>
+<li>[<a href="https://mp.weixin.qq.com/s/5SKgdkC0kaHN495psLd3Tg">NIO相关基础篇三</a>]</li>
+</ul>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hello-world-example/Java-IO/edit/master/HuGo/content/docs/IO-Multiplexing-Type.md" target="_blank" rel="noopener">
+      <img src="/Java-IO/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        <script>
+    var images = document.getElementsByTagName("img")
+    console.info(images.length)
+    for (var i = 0; i < images.length; i++) {
+        var image = images[i]
+        var src = image.getAttribute("src");
+        if (src.startsWith("-images")) {
+            image.setAttribute("src", "../" + src);
+        }
+        image.onclick = function () {
+            window.open(this.getAttribute("src"))
+        }
+    }
+</script>
+
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#selectosubnsub">select（O<!-- raw HTML omitted -->(n)<!-- raw HTML omitted -->）</a></li>
+    <li><a href="#pollosubnsub">poll（O<!-- raw HTML omitted -->(n)<!-- raw HTML omitted -->）</a></li>
+    <li><a href="#epollosub1sub">epoll（O<!-- raw HTML omitted -->(1)<!-- raw HTML omitted -->）</a>
+      <ul>
+        <li><a href="#水平触发-ltlevel-triggered">水平触发 LT(Level Triggered)</a></li>
+        <li><a href="#边缘触发-et-edge-triggered">边缘触发 ET (Edge Triggered)</a></li>
+        <li><a href="#epoll-优点">epoll 优点</a></li>
+      </ul>
+    </li>
+    <li><a href="#kqueue">kqueue</a></li>
+    <li><a href="#read-more">Read More</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

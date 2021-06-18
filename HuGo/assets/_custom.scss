@@ -3,10 +3,19 @@
 // @import "plugins/numbered";
 // @import "plugins/scrollbars";
 
-.markdown table tr td{
-  line-height:1.6;
+.markdown table tr td {
+  line-height: 1.6;
 }
 
-.container{
+.container {
   max-width: 110rem !important;
-} 
+}
+
+.markdown img {
+  border: 5px solid #e9ecef;
+  border-radius: 10px;
+}
+
+.markdown img:hover {
+  cursor: pointer;
+}

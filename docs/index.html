@@ -14,7 +14,7 @@
 <link rel="icon" href="/Java-IO/favicon.png" type="image/x-icon">
 
 
-<link rel="stylesheet" href="/Java-IO/book.min.d436f463c9471cfab26a8b71cd2f50b6abf5225806391453da4ca111d1834fef.css" integrity="sha256-1Db0Y8lHHPqyaotxzS9Qtqv1IlgGORRT2kyhEdGDT&#43;8=">
+<link rel="stylesheet" href="/Java-IO/book.min.00b8e784201abfe629a6e0741e94bf44575af8612aec171d94e4ecbd3692cf5c.css" integrity="sha256-ALjnhCAav&#43;YppuB0HpS/RFda&#43;GEq7BcdlOTsvTaSz1w=">
 
 
 <link rel="alternate" type="application/rss+xml" href="https://hello-world-example.github.io/Java-IO/index.xml" title="Java-IO" />
@@ -49,12 +49,17 @@ https://github.com/alex-shpak/hugo-book
 
 
   <ul>
+<li><a href="/Java-IO/docs/Network-IO-Model/">5 种 IO 模型</a></li>
+<li><a href="/Java-IO/docs/IO-Multiplexing-Type/">IO 多路复用</a></li>
+<li><a href="/Java-IO/docs/Zero-Copy/">零拷贝技术</a></li>
 <li><a href="/Java-IO/docs/NIO/"><strong>NIO</strong></a>
 <ul>
 <li><a href="/Java-IO/docs/NIO/Buffer/">Buffer</a></li>
+<li><a href="/Java-IO/docs/NIO/Channel/">Channel</a></li>
 <li><a href="/Java-IO/docs/NIO/Selector/">Selector</a></li>
 </ul>
 </li>
+<li><a href="/Network"><strong>Network</strong>🔗 </a></li>
 </ul>
 
 
@@ -140,17 +145,19 @@ https://github.com/alex-shpak/hugo-book
 </div>
 
  
-        
-<script>
-var images = document.getElementsByTagName("img")
-console.info(images.length)
-for(var i=0; i<images.length; i++){
-  var image = images[i]
-  var src = image.getAttribute("src");
-  if(src.startsWith("-images")){
-    image.setAttribute("src", "../" + src)
-  }
-}
+        <script>
+    var images = document.getElementsByTagName("img")
+    console.info(images.length)
+    for (var i = 0; i < images.length; i++) {
+        var image = images[i]
+        var src = image.getAttribute("src");
+        if (src.startsWith("-images")) {
+            image.setAttribute("src", "../" + src);
+        }
+        image.onclick = function () {
+            window.open(this.getAttribute("src"))
+        }
+    }
 </script>
 
       </footer>

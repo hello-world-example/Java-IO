@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="零拷贝技术  本文来自：原来 8 张图，就可以搞懂「零拷贝」了_小林coding
+ DMA  DMA：Direct Memory Access，直接内存访问 DMA 主要功能是传输数据，但是不需要占用 CPU，即在传输数据时，CPU 可以做别的事 如今由于 I/O 设备越来越多，数据传输的需求也不尽相同，所以每个 I/O 设备里面都有自己的 DMA 控制器  传统文件传输方式  图中 1 份数据的 Copy 过程，产生了 4 次上下切换 和 4 次数据 Copy 零拷贝技术 的目的是为 减少「用户态与内核态的上下文切换」和「内存拷贝」的次数  优化传输的思路 减少上下文切换  读取磁盘数据的时候，之所以要发生上下文切换，这是因为用户空间没有权限操作磁盘或网卡 所以，操作设备的过程都需要交由操作系统内核来完成，所以一般要通过使用操作系统提供的系统调用函数 一次系统调用必然会发生 2 次上下文切换  调用的时候，首先从用户态切换到内核态 当内核执行完任务后，再切换回用户态交由进程代码执行   要想减少上下文切换到次数，就要 减少系统调用的次数  减少拷贝次数  传统的文件传输方式会历经 4 次数据拷贝 从内核的读缓冲区拷贝到用户的缓冲区里，再从用户的缓冲区里拷贝到 socket 的缓冲区里，这个过程是没有必要的 文件传输的应用场景中，在用户空间我们并不会对数据「再加工」，所以可以不用搬运到用户空间，因此用户的缓冲区是没有必要存在的  mmap &#43; write  使用 mmap() 来代替 read()， 可以减少一次数据拷贝的过程，减少了一次 数据 Copy  NIO 示例 final Path filePath = FileChannelTool."><meta property="og:title" content="" />
+<meta property="og:description" content="零拷贝技术  本文来自：原来 8 张图，就可以搞懂「零拷贝」了_小林coding
+ DMA  DMA：Direct Memory Access，直接内存访问 DMA 主要功能是传输数据，但是不需要占用 CPU，即在传输数据时，CPU 可以做别的事 如今由于 I/O 设备越来越多，数据传输的需求也不尽相同，所以每个 I/O 设备里面都有自己的 DMA 控制器  传统文件传输方式  图中 1 份数据的 Copy 过程，产生了 4 次上下切换 和 4 次数据 Copy 零拷贝技术 的目的是为 减少「用户态与内核态的上下文切换」和「内存拷贝」的次数  优化传输的思路 减少上下文切换  读取磁盘数据的时候，之所以要发生上下文切换，这是因为用户空间没有权限操作磁盘或网卡 所以，操作设备的过程都需要交由操作系统内核来完成，所以一般要通过使用操作系统提供的系统调用函数 一次系统调用必然会发生 2 次上下文切换  调用的时候，首先从用户态切换到内核态 当内核执行完任务后，再切换回用户态交由进程代码执行   要想减少上下文切换到次数，就要 减少系统调用的次数  减少拷贝次数  传统的文件传输方式会历经 4 次数据拷贝 从内核的读缓冲区拷贝到用户的缓冲区里，再从用户的缓冲区里拷贝到 socket 的缓冲区里，这个过程是没有必要的 文件传输的应用场景中，在用户空间我们并不会对数据「再加工」，所以可以不用搬运到用户空间，因此用户的缓冲区是没有必要存在的  mmap &#43; write  使用 mmap() 来代替 read()， 可以减少一次数据拷贝的过程，减少了一次 数据 Copy  NIO 示例 final Path filePath = FileChannelTool." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hello-world-example.github.io/Java-IO/docs/Zero-Copy/" />
+
+<title>Zero Copy | Java-IO</title>
+<link rel="icon" href="/Java-IO/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/Java-IO/book.min.00b8e784201abfe629a6e0741e94bf44575af8612aec171d94e4ecbd3692cf5c.css" integrity="sha256-ALjnhCAav&#43;YppuB0HpS/RFda&#43;GEq7BcdlOTsvTaSz1w=">
+
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/Java-IO"><span>Java-IO</span>
+  </a>
+</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+  <ul>
+<li><a href="/Java-IO/docs/Network-IO-Model/">5 种 IO 模型</a></li>
+<li><a href="/Java-IO/docs/IO-Multiplexing-Type/">IO 多路复用</a></li>
+<li><a href="/Java-IO/docs/Zero-Copy/"class=active>零拷贝技术</a></li>
+<li><a href="/Java-IO/docs/NIO/"><strong>NIO</strong></a>
+<ul>
+<li><a href="/Java-IO/docs/NIO/Buffer/">Buffer</a></li>
+<li><a href="/Java-IO/docs/NIO/Channel/">Channel</a></li>
+<li><a href="/Java-IO/docs/NIO/Selector/">Selector</a></li>
+</ul>
+</li>
+<li><a href="/Network"><strong>Network</strong>🔗 </a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/Java-IO/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>Zero Copy</strong>
+
+  <label for="toc-control">
+    <img src="/Java-IO/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#dma">DMA</a></li>
+    <li><a href="#传统文件传输方式">传统文件传输方式</a></li>
+    <li><a href="#优化传输的思路">优化传输的思路</a>
+      <ul>
+        <li><a href="#减少上下文切换">减少上下文切换</a></li>
+        <li><a href="#减少拷贝次数">减少拷贝次数</a></li>
+      </ul>
+    </li>
+    <li><a href="#mmap--write">mmap + write</a>
+      <ul>
+        <li><a href="#nio-示例">NIO 示例</a></li>
+      </ul>
+    </li>
+    <li><a href="#sendfiletransferto">sendfile（transferTo）</a>
+      <ul>
+        <li><a href="#nio-示例-1">NIO 示例</a></li>
+      </ul>
+    </li>
+    <li><a href="#完全-零拷贝">完全 零拷贝</a></li>
+    <li><a href="#read-more">Read More</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h1 id="零拷贝技术">零拷贝技术</h1>
+<blockquote>
+<p>本文来自：<a href="https://blog.csdn.net/qq_34827674/article/details/108756999">原来 8 张图，就可以搞懂「零拷贝」了_小林coding</a></p>
+</blockquote>
+<h2 id="dma">DMA</h2>
+<ul>
+<li>DMA：<strong>Direct Memory Access</strong>，直接内存访问</li>
+<li>DMA <strong>主要功能是传输数据</strong>，但是<strong>不需要占用 CPU</strong>，即在传输数据时，CPU 可以做别的事</li>
+<li>如今由于 I/O 设备越来越多，数据传输的需求也不尽相同，所以每个 <strong>I/O 设备里面都有自己的 DMA 控制器</strong></li>
+</ul>
+<h2 id="传统文件传输方式">传统文件传输方式</h2>
+<p><img src="-images/Zero-Copy-read-write.png" alt="img" /></p>
+<ul>
+<li>图中 <strong>1 份数据</strong>的 Copy 过程，产生了 <strong>4 次上下切换</strong> 和 <strong>4 次数据 Copy</strong></li>
+<li>零拷贝技术 的目的是为 <strong>减少「用户态与内核态的上下文切换」和「内存拷贝」的次数</strong></li>
+</ul>
+<h2 id="优化传输的思路">优化传输的思路</h2>
+<h3 id="减少上下文切换">减少上下文切换</h3>
+<ul>
+<li>读取磁盘数据的时候，之所以要发生上下文切换，这是<strong>因为用户空间没有权限操作磁盘或网卡</strong></li>
+<li>所以，操作设备的过程都<strong>需要交由操作系统内核来完成</strong>，所以一般要通过<strong>使用操作系统提供的系统调用函数</strong></li>
+<li>一次<strong>系统调用</strong>必然会发生 2 次上下文切换
+<ol>
+<li>调用的时候，首先从用户态切换到内核态</li>
+<li>当内核执行完任务后，再切换回用户态交由进程代码执行</li>
+</ol>
+</li>
+<li>要想减少上下文切换到次数，就要 <strong>减少系统调用的次数</strong></li>
+</ul>
+<h3 id="减少拷贝次数">减少拷贝次数</h3>
+<ul>
+<li>传统的文件传输方式会历经 4 次数据拷贝</li>
+<li><del>从内核的读缓冲区拷贝到用户的缓冲区里，再从用户的缓冲区里拷贝到 socket 的缓冲区里</del>，这个过程是没有必要的</li>
+<li><strong>文件传输的应用场景中，在用户空间我们并不会对数据「再加工」</strong>，所以可以不用搬运到用户空间，因此用户的缓冲区是没有必要存在的</li>
+</ul>
+<h2 id="mmap--write">mmap + write</h2>
+<p><img src="-images/Zero-Copy-mmap.png" alt="img" /></p>
+<ul>
+<li>使用 <code>mmap()</code> 来代替 <code>read()</code>， 可以减少一次数据拷贝的过程，<strong>减少了一次 数据 Copy</strong></li>
+</ul>
+<h3 id="nio-示例">NIO 示例</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">final</span> Path filePath <span style="color:#f92672">=</span> FileChannelTool<span style="color:#f92672">.</span><span style="color:#a6e22e">getResourcePath</span><span style="color:#f92672">(</span>MMapMain<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+<span style="color:#75715e">// 
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">final</span> FileChannel fileChannel <span style="color:#f92672">=</span> FileChannel<span style="color:#f92672">.</span><span style="color:#a6e22e">open</span><span style="color:#f92672">(</span>filePath<span style="color:#f92672">,</span> READ<span style="color:#f92672">);</span>
+<span style="color:#75715e">// memory-mapped
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">final</span> MappedByteBuffer buffer <span style="color:#f92672">=</span> fileChannel<span style="color:#f92672">.</span><span style="color:#a6e22e">map</span><span style="color:#f92672">(</span>FileChannel<span style="color:#f92672">.</span><span style="color:#a6e22e">MapMode</span><span style="color:#f92672">.</span><span style="color:#a6e22e">READ_ONLY</span><span style="color:#f92672">,</span> 0<span style="color:#f92672">,</span> 1024<span style="color:#f92672">);</span>
+<span style="color:#75715e">// 
+</span><span style="color:#75715e">// 通过 UDP 发送出去
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">final</span> DatagramChannel channel <span style="color:#f92672">=</span> DatagramChannel<span style="color:#f92672">.</span><span style="color:#a6e22e">open</span><span style="color:#f92672">();</span>
+<span style="color:#75715e">// write
+</span><span style="color:#75715e"></span>channel<span style="color:#f92672">.</span><span style="color:#a6e22e">send</span><span style="color:#f92672">(</span>buffer<span style="color:#f92672">,</span> <span style="color:#66d9ef">new</span> InetSocketAddress<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;127.0.0.1&#34;</span><span style="color:#f92672">,</span> 9999<span style="color:#f92672">));</span>
+</code></pre></div><h2 id="sendfiletransferto">sendfile（transferTo）</h2>
+<p><img src="-images/Zero-Copy-sendfile.png" alt="img" /></p>
+<ul>
+<li>在 Linux 内核版本 2.1 中，提供了一个<strong>专门发送文件的系统调用函数</strong> <code>sendfile()</code></li>
+<li>可以替代前面的 <code>read()</code> 和 <code>write()</code> 这两个系统调用，这样就 <strong>可以减少一次系统调用</strong>，也就 <strong>减少了 2 次上下文切换的开销</strong></li>
+<li>可以<strong>直接把内核缓冲区里的数据拷贝到 Socket 缓冲区里</strong>，不再拷贝到用户态</li>
+<li>整个过程 <strong>有 2 次上下文切换</strong>，<strong>3 次数据拷贝</strong></li>
+</ul>
+<h3 id="nio-示例-1">NIO 示例</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">final</span> Path filePath <span style="color:#f92672">=</span> FileChannelTool<span style="color:#f92672">.</span><span style="color:#a6e22e">getResourcePath</span><span style="color:#f92672">(</span>SendfileMain<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+
+<span style="color:#75715e">//
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">final</span> FileChannel fileChannel <span style="color:#f92672">=</span> FileChannel<span style="color:#f92672">.</span><span style="color:#a6e22e">open</span><span style="color:#f92672">(</span>filePath<span style="color:#f92672">,</span> READ<span style="color:#f92672">);</span>
+
+<span style="color:#75715e">//
+</span><span style="color:#75715e">// 通过 UDP 发送出去
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">final</span> DatagramChannel channel <span style="color:#f92672">=</span> DatagramChannel<span style="color:#f92672">.</span><span style="color:#a6e22e">open</span><span style="color:#f92672">();</span>
+channel<span style="color:#f92672">.</span><span style="color:#a6e22e">connect</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> InetSocketAddress<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;127.0.0.1&#34;</span><span style="color:#f92672">,</span> 9999<span style="color:#f92672">));</span>
+
+<span style="color:#75715e">// sendfile
+</span><span style="color:#75715e"></span>fileChannel<span style="color:#f92672">.</span><span style="color:#a6e22e">transferTo</span><span style="color:#f92672">(</span>0<span style="color:#f92672">,</span> 1024<span style="color:#f92672">,</span> channel<span style="color:#f92672">);</span>
+</code></pre></div><h2 id="完全-零拷贝">完全 零拷贝</h2>
+<ul>
+<li><code>sendfile</code> 系统调用，<strong>仍然有一次 CPU Copy 过程</strong>，还不是真正的零拷贝技术</li>
+<li>如果网卡支持 <strong>SG-DMA</strong>（The Scatter-Gather Direct Memory Access）技术，可以进一步<strong>减少 CPU 把内核缓冲区里的数据拷贝到 Socket 缓冲区</strong>的过程</li>
+</ul>
+<p>查看网卡是否支持 scatter-gather 特性</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ ethtool -k eth0 | grep scatter-gather
+scatter-gather: on
+</code></pre></div><p><img src="-images/Zero-Copy-Real.png" alt="img" /></p>
+<ul>
+<li>
+<p>这就是所谓的 <strong>零拷贝（Zero-copy）技术</strong></p>
+</li>
+<li>
+<p>没有在内存层面去拷贝数据，也就是说<strong>全程没有通过 CPU 来搬运数据</strong>，所有的数据 <strong>都是通过 DMA 来进行传输的</strong></p>
+</li>
+<li>
+<p>需要 <strong>2 次上下文切换</strong>，<strong>2 次数据拷贝</strong>且都不需要通过 CPU，<strong>2 次都是由 DMA 来搬运</strong></p>
+</li>
+<li>
+<p>零拷贝技术可以把文件传输的性能提高至少一倍以上</p>
+</li>
+</ul>
+<h2 id="read-more">Read More</h2>
+<ul>
+<li><a href="https://blog.csdn.net/zxh1592000/article/details/78678132">DMA（直接储存器访问）</a></li>
+</ul>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hello-world-example/Java-IO/edit/master/HuGo/content/docs/Zero-Copy.md" target="_blank" rel="noopener">
+      <img src="/Java-IO/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        <script>
+    var images = document.getElementsByTagName("img")
+    console.info(images.length)
+    for (var i = 0; i < images.length; i++) {
+        var image = images[i]
+        var src = image.getAttribute("src");
+        if (src.startsWith("-images")) {
+            image.setAttribute("src", "../" + src);
+        }
+        image.onclick = function () {
+            window.open(this.getAttribute("src"))
+        }
+    }
+</script>
+
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#dma">DMA</a></li>
+    <li><a href="#传统文件传输方式">传统文件传输方式</a></li>
+    <li><a href="#优化传输的思路">优化传输的思路</a>
+      <ul>
+        <li><a href="#减少上下文切换">减少上下文切换</a></li>
+        <li><a href="#减少拷贝次数">减少拷贝次数</a></li>
+      </ul>
+    </li>
+    <li><a href="#mmap--write">mmap + write</a>
+      <ul>
+        <li><a href="#nio-示例">NIO 示例</a></li>
+      </ul>
+    </li>
+    <li><a href="#sendfiletransferto">sendfile（transferTo）</a>
+      <ul>
+        <li><a href="#nio-示例-1">NIO 示例</a></li>
+      </ul>
+    </li>
+    <li><a href="#完全-零拷贝">完全 零拷贝</a></li>
+    <li><a href="#read-more">Read More</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
