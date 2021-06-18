@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Reactor 和 Proactor 模型  本文来自：理解高性能网络模型
+ 阻塞 I/O 模型  特点  每个连接都需要独立的线程 完成数据输入、业务处理、数据返回   存在问题  当并发数较大时，需要创建大量线程来处理连接，系统资源占用较大 连接建立后，如果当前线程暂时没有数据可读，则线程就阻塞在 read 操作上，造成线程资源浪费    Reactor 模型  Reactor 翻译过来的意思是 反应堆，即对事件反应 Reactor 模式也叫 Dispatcher 模式，即 I/O 多路复用监听事件，收到事件后根据事件类型分配（Dispatch）给某个线程 I/O复用 &#43; 线程池，这就是 Reactor 模式基本设计思想    Reactor 模式主要由 Reactor 和 处理资源池 这两个核心部分组成：
+ Reactor 负责监听和分发事件，事件类型包含连接事件、读写事件； 处理资源池 负责处理事件，如 read -&gt; 业务逻辑 -&gt; send；    根据 Reactor 数量 和 处理资源池线程的数量 不同，有 3种 典型的实现："><meta property="og:title" content="" />
+<meta property="og:description" content="Reactor 和 Proactor 模型  本文来自：理解高性能网络模型
+ 阻塞 I/O 模型  特点  每个连接都需要独立的线程 完成数据输入、业务处理、数据返回   存在问题  当并发数较大时，需要创建大量线程来处理连接，系统资源占用较大 连接建立后，如果当前线程暂时没有数据可读，则线程就阻塞在 read 操作上，造成线程资源浪费    Reactor 模型  Reactor 翻译过来的意思是 反应堆，即对事件反应 Reactor 模式也叫 Dispatcher 模式，即 I/O 多路复用监听事件，收到事件后根据事件类型分配（Dispatch）给某个线程 I/O复用 &#43; 线程池，这就是 Reactor 模式基本设计思想    Reactor 模式主要由 Reactor 和 处理资源池 这两个核心部分组成：
+ Reactor 负责监听和分发事件，事件类型包含连接事件、读写事件； 处理资源池 负责处理事件，如 read -&gt; 业务逻辑 -&gt; send；    根据 Reactor 数量 和 处理资源池线程的数量 不同，有 3种 典型的实现：" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hello-world-example.github.io/Java-IO/docs/Reactor-and-Proactor/" />
+
+<title>Reactor and Proactor | Java-IO</title>
+<link rel="icon" href="/Java-IO/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/Java-IO/book.min.00b8e784201abfe629a6e0741e94bf44575af8612aec171d94e4ecbd3692cf5c.css" integrity="sha256-ALjnhCAav&#43;YppuB0HpS/RFda&#43;GEq7BcdlOTsvTaSz1w=">
+
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/Java-IO"><span>Java-IO</span>
+  </a>
+</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+  <ul>
+<li><a href="/Java-IO/docs/Network-IO-Model/">5 种 IO 模型</a></li>
+<li><a href="/Java-IO/docs/IO-Multiplexing-Type/">IO 多路复用</a></li>
+<li><a href="/Java-IO/docs/Zero-Copy/">零拷贝技术</a></li>
+<li><a href="/Java-IO/docs/Reactor-and-Proactor/"class=active>Reactor 和 Proactor</a></li>
+<li><a href="/Java-IO/docs/NIO/"><strong>NIO</strong></a>
+<ul>
+<li><a href="/Java-IO/docs/NIO/Buffer/">Buffer</a></li>
+<li><a href="/Java-IO/docs/NIO/Channel/">Channel</a></li>
+<li><a href="/Java-IO/docs/NIO/Selector/">Selector</a></li>
+</ul>
+</li>
+<li><a href="/Network"><strong>Network</strong>🔗 </a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/Java-IO/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>Reactor and Proactor</strong>
+
+  <label for="toc-control">
+    <img src="/Java-IO/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#阻塞-io-模型">阻塞 I/O 模型</a></li>
+    <li><a href="#reactor-模型">Reactor 模型</a>
+      <ul>
+        <li><a href="#单reactor--单线程">单Reactor ↔ 单线程</a></li>
+        <li><a href="#单reactor--多线程">单Reactor ↔ 多线程</a></li>
+        <li><a href="#多reactor--多线程">多Reactor ↔ 多线程</a></li>
+      </ul>
+    </li>
+    <li><a href="#proactor-模型">Proactor 模型</a></li>
+    <li><a href="#read-more">Read More</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h1 id="reactor-和-proactor-模型">Reactor 和 Proactor 模型</h1>
+<blockquote>
+<p>本文来自：<a href="https://www.jianshu.com/p/2965fca6bb8f">理解高性能网络模型</a></p>
+</blockquote>
+<h2 id="阻塞-io-模型">阻塞 I/O 模型</h2>
+<p><img src="-images/Reactor-and-Proactor_Blocking-IO.png" alt="img" /></p>
+<ul>
+<li><strong>特点</strong>
+<ul>
+<li><strong>每个连接都需要独立的线程</strong> 完成数据输入、业务处理、数据返回</li>
+</ul>
+</li>
+<li><strong>存在问题</strong>
+<ul>
+<li>当并发数较大时，需要创建大量线程来处理连接，系统资源占用较大</li>
+<li>连接建立后，如果当前线程暂时没有数据可读，则线程就阻塞在 read 操作上，造成线程资源浪费</li>
+</ul>
+</li>
+</ul>
+<h2 id="reactor-模型">Reactor 模型</h2>
+<ul>
+<li>Reactor 翻译过来的意思是 <strong>反应堆</strong>，即对事件反应</li>
+<li>Reactor 模式也叫 <strong>Dispatcher 模式</strong>，即 I/O 多路复用监听事件，<strong>收到事件后根据事件类型分配（Dispatch）给某个线程</strong></li>
+<li><strong>I/O复用 + 线程池</strong>，这就是 Reactor 模式基本设计思想</li>
+</ul>
+<p><img src="-images/Reactor-and-Proactor_Reactor-Model.png" alt="img" /></p>
+<ul>
+<li>
+<p>Reactor 模式主要由 <strong>Reactor</strong> 和 <strong>处理资源池</strong> 这两个核心部分组成：</p>
+<ul>
+<li><strong>Reactor</strong> 负责监听和分发事件，事件类型包含连接事件、读写事件；</li>
+<li><strong>处理资源池</strong> 负责处理事件，如 read -&gt; 业务逻辑 -&gt; send；</li>
+</ul>
+</li>
+<li>
+<p>根据 <strong>Reactor 数量</strong> 和 <strong>处理资源池线程的数量</strong> 不同，有 3种 典型的实现：</p>
+<ul>
+<li>单Reactor ↔ 单线程</li>
+<li>单Reactor ↔ 多线程</li>
+<li>多Reactor ↔ 多线程</li>
+</ul>
+</li>
+</ul>
+<h3 id="单reactor--单线程">单Reactor ↔ 单线程</h3>
+<p><img src="-images/Reactor-and-Proactor_Single-Single.png" alt="img" /></p>
+<ul>
+<li><strong>优点</strong>
+<ul>
+<li>模型简单，没有多线程、进程通信、竞争的问题，全部都在一个线程中完成</li>
+</ul>
+</li>
+<li><strong>缺点</strong>
+<ul>
+<li>只有一个线程，无法完全发挥多核 CPU 的性能</li>
+<li>Handler 在处理某个连接上的业务时，整个进程无法处理其他连接事件，很容易导致性能瓶颈</li>
+</ul>
+</li>
+<li><strong>场景</strong>
+<ul>
+<li>客户端的数量有限，业务处理非常快速，比如 Redis</li>
+</ul>
+</li>
+</ul>
+<h3 id="单reactor--多线程">单Reactor ↔ 多线程</h3>
+<p><img src="-images/Reactor-and-Proactor_Single-Multi.png" alt="img" /></p>
+<ul>
+<li><strong>优点</strong>
+<ul>
+<li>可以充分利用多核 CPU 的处理能力</li>
+</ul>
+</li>
+<li><strong>缺点</strong>
+<ul>
+<li>多线程数据共享和访问比较复杂</li>
+<li>Reactor 承担所有事件的监听和响应，高并发场景下容易成为性能瓶颈</li>
+</ul>
+</li>
+</ul>
+<h3 id="多reactor--多线程">多Reactor ↔ 多线程</h3>
+<p><img src="-images/Reactor-and-Proactor_Multi-Multi.png" alt="img" /></p>
+<ul>
+<li><strong>说明</strong>
+<ul>
+<li>Reactor 主线程 MainReactor 对象监听连接事件，收到事件后通过 Acceptor 接收，处理建立连接事件</li>
+<li>Accepto 处理建立连接事件后，MainReactor 将连接分配 Reactor子线程给 SubReactor 进行处理</li>
+<li>SubReactor 将连接加入连接队列进行监听，并创建一个 Handler 用于处理各种连接事件</li>
+<li>当有新的事件发生时，SubReactor 会调用连接对应的 Handler 进行响应</li>
+<li>Handler 通过 read 读取数据后，会分发给后面的 Worker 线程池进行业务处理</li>
+<li>Worker 线程池会分配独立的线程完成真正的业务处理</li>
+</ul>
+</li>
+<li><strong>优点</strong>
+<ul>
+<li>父线程 与 子线程 的数据交互简单职责明确，<strong>父线程只需要接收新连接，子线程完成后续的业务处理</strong></li>
+<li>父线程 与 子线程 的数据交互简单，Reactor 主线程 只需要把新连接传给子线程，子线程无需返回数据</li>
+<li>这种模型在许多项目中广泛使用，包括 <strong>Nginx 主从多进程模型</strong>、<strong>Netty 主从多线程模型</strong>..</li>
+</ul>
+</li>
+</ul>
+<h2 id="proactor-模型">Proactor 模型</h2>
+<ul>
+<li>Reactor 等待某个事件状态发生，然后把这个事件传给事先注册的 Handler，由后者来做实际的读写操作，其中的<strong>读写操作都需要应用程序同步操作</strong>，所以 Reactor 是 <strong>非阻塞同步</strong> 网络模型</li>
+<li>如果把 I/O 操作改为异步，交给操作系统来完成，这就是 <strong>异步网络模型 Proactor</strong></li>
+</ul>
+<p><img src="-images/Reactor-and-Proactor_Proactor-Model.png" alt="img" /></p>
+<ul>
+<li>
+<p><code>Reactor</code> 是在事件发生时通知事先注册的事件，<strong>读写在应用程序线程中处理完成</strong></p>
+</li>
+<li>
+<p><code>Proactor</code> 是在事件发生时<strong>基于异步 I/O 完成读写操作，由内核完成</strong>，待 <strong>I/O 操作完成后才回调应用程序的业务处理器</strong></p>
+</li>
+<li>
+<p><strong>优点</strong></p>
+<ul>
+<li>理论上 Proactor 比 Reactor 效率更高，<strong>能更加充分发挥 DMA 的优势</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>缺点</strong></p>
+<ul>
+<li><strong>编程复杂性：</strong> 由于异步操作流程的事件的初始化和事件完成在时间和空间上都是相互分离的，因此开发异步应用程序更加复杂</li>
+<li><strong>内存使用：</strong>  缓冲区在读或写操作的时间段内必须保持住，可能造成持续的不确定性，并且每个并发操作都要求有独立的缓存，相比Reactor模式，在 Socket 已经准备好读或写前，是不要求开辟缓存的</li>
+<li><strong>操作系统支持：</strong> Windows 下通过 IOCP 实现了真正的异步 I/O，而在 Linux 系统下，目前异步 I/O 还不完善，因此在 <strong>Linux 下实现高并发网络编程都是以 Reactor 模型为主</strong></li>
+</ul>
+</li>
+</ul>
+<h2 id="read-more">Read More</h2>
+<ul>
+<li><a href="https://mp.weixin.qq.com/s/GRkZ1IEfTalQSkErWe1SAg">原来 8 张图，就能学废 Reactor 和 Proactor</a></li>
+</ul>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hello-world-example/Java-IO/edit/master/HuGo/content/docs/Reactor-and-Proactor.md" target="_blank" rel="noopener">
+      <img src="/Java-IO/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        <script>
+    var images = document.getElementsByTagName("img")
+    console.info(images.length)
+    for (var i = 0; i < images.length; i++) {
+        var image = images[i]
+        var src = image.getAttribute("src");
+        if (src.startsWith("-images")) {
+            image.setAttribute("src", "../" + src);
+        }
+        image.onclick = function () {
+            window.open(this.getAttribute("src"))
+        }
+    }
+</script>
+
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#阻塞-io-模型">阻塞 I/O 模型</a></li>
+    <li><a href="#reactor-模型">Reactor 模型</a>
+      <ul>
+        <li><a href="#单reactor--单线程">单Reactor ↔ 单线程</a></li>
+        <li><a href="#单reactor--多线程">单Reactor ↔ 多线程</a></li>
+        <li><a href="#多reactor--多线程">多Reactor ↔ 多线程</a></li>
+      </ul>
+    </li>
+    <li><a href="#proactor-模型">Proactor 模型</a></li>
+    <li><a href="#read-more">Read More</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
